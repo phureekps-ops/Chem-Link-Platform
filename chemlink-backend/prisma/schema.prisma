@@ -1,0 +1,120 @@
+// ChemLink Platform — Identity & Company data model
+// Build Sequence Step 1 (see System Design Document, Section 7 & 14.2)
+// "Single Company, Multi-Role" model: one Company can activate both
+// a BUYER role profile and a SELLER role profile (Section 14.1).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleType {
+  BUYER
+  SELLER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum VerificationDocType {
+  TRADE_REGISTRATION      // หนังสือรับรองบริษัท
+  HAZMAT_LICENSE          // ใบอนุญาตวัตถุอันตราย (ผู้ขาย)
+  ISO_CERTIFICATE         // ใบรับรอง ISO/GMP (ผู้ขาย)
+  AUTHORIZED_BUYER_LETTER // หนังสือมอบอำนาจผู้มีอำนาจจัดซื้อ (ผู้ซื้อ)
+  OTHER
+}
+
+// Company: single legal entity identity, shared across all roles (Section 14.1)
+model Company {
+  id            String   @id @default(uuid())
+  legalName     String
+  taxId         String   @unique
+  address       String?
+  province      String?
+  industryType  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  roles CompanyRole[]
+  users User[]
+
+  @@map("companies")
+}
+
+// CompanyRole: one row per activated role (BUYER and/or SELLER).
+// Trust Score is composite per role (Section 15.1):
+//   verificationScore 30% + ratingScore 50% + behavioralScore 20%
+model CompanyRole {
+  id                  String             @id @default(uuid())
+  companyId           String
+  company             Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  roleType            RoleType
+  verificationStatus  VerificationStatus @default(PENDING)
+
+  verificationScore   Float @default(0) // from KYC / document checks
+  ratingScore         Float @default(0) // from Section 15 reviews (populated later)
+  behavioralScore     Float @default(0) // from RFQ response rate etc (populated later)
+
+  activatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents VerificationDocument[]
+
+  @@unique([companyId, roleType]) // a company can only activate BUYER once, SELLER once
+  @@map("company_roles")
+}
+
+// Verification documents attached to a specific role activation (Section 14.2)
+model VerificationDocument {
+  id            String              @id @default(uuid())
+  companyRoleId String
+  companyRole   CompanyRole         @relation(fields: [companyRoleId], references: [id], onDelete: Cascade)
+  docType       VerificationDocType
+  fileUrl       String
+  status        VerificationStatus  @default(PENDING)
+  reviewedNote  String?
+  uploadedAt    DateTime            @default(now())
+
+  @@map("verification_documents")
+}
+
+// User: individual login under a Company. allowedRoles is a subset of the
+// company's activated CompanyRole types (Section 14.1 — per-user role access).
+model User {
+  id              String     @id @default(uuid())
+  companyId       String
+  company         Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  email           String     @unique
+  passwordHash    String
+  fullName        String
+  position        String?
+  isCompanyAdmin  Boolean    @default(false)
+  allowedRoles    RoleType[] // e.g. [SELLER] for a sales rep, [BUYER, SELLER] for an owner
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+// Refresh tokens stored hashed, revocable (used by /auth/refresh and /auth/logout)
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
