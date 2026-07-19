@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สร้างคำขอใบเสนอราคา (RFQ) — ChemLink Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10181A; --paper:#F1F3EF; --surface:#FFFFFF;
+    --navy:#0C2A2F; --navy-2:#123A40; --navy-3:#1B4C53;
+    --orange:#DD5A26; --orange-ink:#8C3714;
+    --green:#166F58; --green-tint:#E4F1EB; --green-ink:#0F4E3D;
+    --gold:#AD7A24; --gold-tint:#F7EEDC;
+    --red:#AE3A2E; --red-tint:#FBE9E7; --red-ink:#7A2A21;
+    --line:#DBDFD6; --line-on-navy:rgba(255,255,255,0.14);
+    --muted:#5B655F; --muted-on-navy:#A9C2C1;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Thai","IBM Plex Sans",sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;} img,svg{display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .skip-link{position:absolute;left:-999px;top:0;background:var(--orange);color:#fff;padding:10px 16px;z-index:999;border-radius:0 0 6px 0;}
+  .skip-link:focus{left:0;}
+
+  .util-bar{background:var(--navy);color:var(--muted-on-navy);font-size:13px;}
+  .util-bar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;}
+  .util-bar a{text-decoration:none;color:var(--muted-on-navy);}
+  .util-links{display:flex;gap:20px;align-items:center;}
+  .util-links .divider{width:1px;height:12px;background:var(--line-on-navy);}
+
+  .nav{background:var(--surface);border-bottom:0.5px solid var(--line);position:sticky;top:0;z-index:50;}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  .brand-word{font-weight:600;font-size:18px;letter-spacing:-0.01em;}
+  .brand-word span{color:var(--orange);}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500;}
+  .nav-links a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
+  .nav-links a:hover{border-bottom-color:var(--orange);}
+  .nav-cta{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+  .btn{font-family:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);border:1.5px solid transparent;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+  .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
+  .btn-primary:hover{background:var(--orange-ink);border-color:var(--orange-ink);}
+  .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--muted);border-color:transparent;}
+  .btn-ghost:hover{color:var(--navy);}
+  .btn-block{width:100%;justify-content:center;}
+  .btn-lg{padding:13px 22px;font-size:15px;}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;}
+
+  /* page head */
+  .page-head{background:var(--surface);border-bottom:0.5px solid var(--line);padding:32px 0 0;}
+  .page-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--orange-ink);letter-spacing:0.04em;margin-bottom:8px;}
+  .page-title{font-size:26px;font-weight:700;margin:0 0 24px;letter-spacing:-0.01em;}
+
+  /* stepper */
+  .stepper{display:flex;padding-bottom:0;}
+  .step{flex:1;position:relative;padding:0 0 18px;border-bottom:3px solid var(--line);}
+  .step:not(:last-child){margin-right:12px;}
+  .step.active{border-bottom-color:var(--orange);}
+  .step.done{border-bottom-color:var(--green);}
+  .step-num{
+    width:26px;height:26px;border-radius:50%;background:var(--paper);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;font-weight:600;margin-bottom:10px;
+  }
+  .step.active .step-num{background:var(--orange);color:#fff;}
+  .step.done .step-num{background:var(--green);color:#fff;}
+  .step-label{font-size:13.5px;font-weight:600;}
+  .step-label-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  /* layout */
+  .rfq-layout{display:grid;grid-template-columns:1fr 340px;gap:32px;padding:40px 0 0;align-items:start;}
+  .card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;}
+  .card + .card{margin-top:20px;}
+  .card-title{font-size:16px;font-weight:600;margin:0 0 4px;}
+  .card-sub{font-size:13px;color:var(--muted);margin:0 0 20px;}
+
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--ink);}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px;}
+  input[type=text], input[type=number], input[type=date], select, textarea{
+    width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);
+  }
+  input:focus, select:focus, textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(221,90,38,0.12);}
+  textarea{resize:vertical;min-height:88px;}
+  .field{margin-bottom:18px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .field-row3{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+  .autocomplete-hit{
+    display:flex;align-items:center;justify-content:space-between;background:var(--paper);
+    border-radius:var(--radius-sm);padding:12px 14px;margin-top:8px;font-size:13.5px;
+  }
+  .autocomplete-hit .name{font-weight:600;}
+  .autocomplete-hit .meta{color:var(--muted);font-size:12px;margin-top:2px;}
+  .chip-remove{width:22px;height:22px;border-radius:50%;background:var(--surface);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+
+  .radio-card{display:flex;gap:12px;border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;cursor:pointer;margin-bottom:10px;}
+  .radio-card.selected{border-color:var(--orange);background:var(--gold-tint);}
+  .radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;margin-top:1px;position:relative;}
+  .radio-card.selected .radio-dot{border-color:var(--orange);}
+  .radio-card.selected .radio-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--orange);}
+  .radio-title{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .radio-sub{font-size:12.5px;color:var(--muted);}
+
+  .seller-pick{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px;}
+  .seller-pick input{width:18px;height:18px;accent-color:var(--orange);flex-shrink:0;}
+  .seller-pick .avatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+  .seller-pick .name{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .seller-pick .name .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .seller-pick .meta{font-size:12px;color:var(--muted);margin-top:1px;}
+  .seller-pick .score{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;color:var(--green-ink);}
+
+  /* sidebar */
+  .assist-card{background:var(--navy);color:#fff;border-radius:var(--radius-lg);padding:22px;}
+  .assist-title{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:600;margin-bottom:14px;}
+  .assist-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+  .chat-bubble{background:rgba(255,255,255,0.06);border:1px solid var(--line-on-navy);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:10px;color:var(--muted-on-navy);}
+  .chat-bubble.user{background:rgba(221,90,38,0.16);color:#fff;border-color:transparent;}
+  .assist-input{display:flex;gap:8px;margin-top:14px;}
+  .assist-input input{flex:1;height:38px;border-radius:var(--radius-sm);border:1px solid var(--line-on-navy);background:rgba(255,255,255,0.06);color:#fff;padding:0 12px;font-size:13px;font-family:inherit;}
+  .assist-input input::placeholder{color:var(--muted-on-navy);}
+
+  .tips-card{margin-top:16px;}
+  .tips-card ul{padding-left:18px;margin:0;font-size:13px;color:var(--muted);line-height:1.9;}
+
+  .summary-bar{
+    position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+    padding:16px 0;margin-top:32px;display:flex;justify-content:space-between;align-items:center;
+  }
+  .summary-left{font-size:13px;color:var(--muted);}
+  .summary-actions{display:flex;gap:10px;}
+
+  /* compare preview */
+  .compare-section{background:var(--surface);border-top:0.5px solid var(--line);padding:56px 0 64px;margin-top:8px;}
+  .section-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--orange-ink);letter-spacing:0.04em;margin-bottom:10px;}
+  .section-title{font-size:22px;font-weight:700;margin:0 0 6px;letter-spacing:-0.01em;}
+  .section-sub{font-size:14px;color:var(--muted);margin:0 0 24px;}
+  table.compare{width:100%;border-collapse:collapse;background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-md);overflow:hidden;}
+  table.compare th{background:var(--paper);text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:12px 16px;}
+  table.compare td{padding:14px 16px;font-size:13.5px;border-top:0.5px solid var(--line);}
+  table.compare tr.best td{background:var(--green-tint);}
+  .rank-badge{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;background:var(--green);color:#fff;padding:3px 8px;border-radius:20px;margin-left:8px;}
+
+  footer{background:var(--navy);color:var(--muted-on-navy);padding:40px 0 28px;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;flex-wrap:wrap;gap:12px;}
+  .foot-links{display:flex;gap:20px;flex-wrap:wrap;}
+  .foot-links a{text-decoration:none;color:var(--muted-on-navy);}
+  .foot-links a:hover{color:#fff;}
+
+  @media (max-width:980px){
+    .rfq-layout{grid-template-columns:1fr;}
+    .field-row, .field-row3{grid-template-columns:1fr;}
+    .stepper{flex-wrap:wrap;}
+    .step{flex:1 1 45%;}
+    .nav-links{display:none;}
+    table.compare{display:block;overflow-x:auto;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 20px;}
+    .summary-bar{flex-direction:column;gap:12px;align-items:stretch;}
+    .summary-actions{justify-content:stretch;}
+    .summary-actions .btn{flex:1;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+
+<div class="util-bar">
+  <div class="wrap">
+    <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
+    <div class="util-links">
+      <a href="#">TH</a><span class="divider"></span><a href="#">EN</a><span class="divider"></span>
+      <a href="#">ติดต่อฝ่ายขาย</a><span class="divider"></span><a href="#">เข้าสู่ระบบ</a>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="chemlink_homepage.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="7" fill="#0C2A2F"/>
+        <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+      </svg>
+      <span class="brand-word">ChemLink <span>Platform</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="chemlink_homepage.html#categories">หมวดหมู่สินค้า</a>
+      <a href="rfq.html">ค้นหา / RFQ</a>
+      <a href="chemlink_homepage.html#ticker">ดัชนีราคา</a>
+      <a href="#">บริการเสริม</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="#">สมัครเป็นผู้ขาย</a>
+      <a class="btn btn-primary" href="#">สมัครเป็นผู้ซื้อ</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="page-eyebrow">ระบบ RFQ</div>
+      <h1 class="page-title">สร้างคำขอใบเสนอราคา</h1>
+      <div class="stepper">
+        <div class="step active">
+          <div class="step-num">1</div>
+          <div class="step-label">ระบุความต้องการ</div>
+          <div class="step-label-sub">สินค้า สเปก ปริมาณ</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-label">เลือกผู้รับ RFQ</div>
+          <div class="step-label-sub">เจาะจง หรือ RFQ Market</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-label">ยืนยันและติดตามสถานะ</div>
+          <div class="step-label-sub">ส่งแล้ว / รับทราบ / เสนอราคา</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-label">เปรียบเทียบใบเสนอราคา</div>
+          <div class="step-label-sub">ตารางเปรียบเทียบ</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="rfq-layout">
+
+      <div>
+        <div class="card">
+          <h2 class="card-title">1. ระบุความต้องการ</h2>
+          <p class="card-sub">กรอกสเปกด้วยตนเอง หรือพิมพ์ในช่อง Sourcing Assistant ทางขวา แล้วให้ระบบช่วยกรอกฟอร์มนี้ให้อัตโนมัติ</p>
+
+          <div class="field">
+            <label for="prod">ค้นหาสินค้า</label>
+            <input type="text" id="prod" value="PP รีไซเคิล เกรด Injection">
+            <div class="autocomplete-hit">
+              <div>
+                <div class="name">เม็ดพลาสติก PP รีไซเคิล เกรด Injection</div>
+                <div class="meta mono">CAS 9003-07-0 · ตรงกับสเปกที่ระบุ</div>
+              </div>
+              <div class="chip-remove" aria-hidden="true">✕</div>
+            </div>
+          </div>
+
+          <div class="field field-row">
+            <div>
+              <label for="qty">ปริมาณที่ต้องการ</label>
+              <input type="number" id="qty" value="12000">
+            </div>
+            <div>
+              <label for="unit">หน่วย</label>
+              <select id="unit">
+                <option>กิโลกรัม (กก.)</option>
+                <option>ตัน</option>
+                <option>ลิตร</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field field-row">
+            <div>
+              <label for="purity">ความบริสุทธิ์ขั้นต่ำ</label>
+              <input type="text" id="purity" value="≥ 98.5%">
+            </div>
+            <div>
+              <label for="grade">เกรด/มาตรฐานที่ต้องการ</label>
+              <input type="text" id="grade" value="Injection grade, มอก. 1888">
+            </div>
+          </div>
+
+          <div class="field field-row3">
+            <div>
+              <label for="loc">สถานที่ส่งมอบ</label>
+              <input type="text" id="loc" value="นิคมอุตสาหกรรมบางปู, สมุทรปราการ">
+            </div>
+            <div>
+              <label for="date">กำหนดส่งมอบภายใน</label>
+              <input type="date" id="date" value="2026-08-15">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="notes">รายละเอียดเพิ่มเติม</label>
+            <textarea id="notes" placeholder="เช่น เงื่อนไขการชำระเงิน บรรจุภัณฑ์ที่ต้องการ หรือข้อกำหนดพิเศษอื่นๆ">ต้องการใบ COA แนบทุกรอบส่งมอบ ชำระเงินแบบเครดิต 30 วัน</textarea>
+            <div class="hint">แนบไฟล์สเปกเพิ่มเติมได้ (SDS, drawing) — <a href="#" style="color:var(--orange-ink);text-decoration:none;font-weight:600;">แนบไฟล์</a></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">2. เลือกผู้รับ RFQ</h2>
+          <p class="card-sub">เลือกส่งถึงผู้ขายที่เจาะจง หรือเปิดให้ผู้ขายที่ตรงสเปกทุกรายเสนอราคาแข่งขันกัน</p>
+
+          <div class="radio-card selected">
+            <div class="radio-dot" aria-hidden="true"></div>
+            <div>
+              <div class="radio-title">ส่งถึงผู้ขายที่เลือกไว้ (3 ราย)</div>
+              <div class="radio-sub">เหมาะเมื่อมีคู่ค้าที่ไว้ใจอยู่แล้ว ได้คำตอบเร็วกว่า</div>
+            </div>
+          </div>
+          <div class="radio-card">
+            <div class="radio-dot" aria-hidden="true"></div>
+            <div>
+              <div class="radio-title">ส่งเข้า RFQ Market</div>
+              <div class="radio-sub">เปิดให้ผู้ขายทุกรายที่มีสินค้าตรงสเปกในระบบเห็นและเสนอราคาแข่งขันกัน</div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div class="seller-pick">
+              <input type="checkbox" checked>
+              <div class="avatar">ทพ</div>
+              <div>
+                <div class="name"><span class="dot" aria-hidden="true"></span> บจก. ไทยโพลีไซเคิล</div>
+                <div class="meta">สมุทรปราการ · ส่งภายใน 7 วัน</div>
+              </div>
+              <div class="score">4.7/5</div>
+            </div>
+            <div class="seller-pick">
+              <input type="checkbox" checked>
+              <div class="avatar">อพ</div>
+              <div>
+                <div class="name"><span class="dot" aria-hidden="true"></span> เอเชีย พอลิเมอร์</div>
+                <div class="meta">ระยอง · ส่งภายใน 5 วัน</div>
+              </div>
+              <div class="score">4.5/5</div>
+            </div>
+            <div class="seller-pick">
+              <input type="checkbox" checked>
+              <div class="avatar">บค</div>
+              <div>
+                <div class="name"><span class="dot" aria-hidden="true"></span> บางกอก คอมพาวนด์</div>
+                <div class="meta">ปทุมธานี · ส่งภายใน 10 วัน</div>
+              </div>
+              <div class="score">4.3/5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="assist-card">
+          <div class="assist-title"><span class="assist-dot" aria-hidden="true"></span> Sourcing Assistant</div>
+          <div class="chat-bubble user">ต้องการ PP รีไซเคิล เกรดฉีด 12 ตัน ส่งบางปูภายใน 15 ส.ค. เครดิต 30 วัน</div>
+          <div class="chat-bubble">กรอกฟอร์มด้านซ้ายให้แล้วครับ พบผู้ขาย 3 รายที่ตรงสเปกและเคยส่งมอบตรงเวลา ต้องการให้ส่งถึงผู้ขายเหล่านี้เลยไหม หรือเปิดเข้า RFQ Market เพื่อเทียบราคาจากผู้ขายรายอื่นด้วย</div>
+          <div class="assist-input">
+            <input type="text" placeholder="พิมพ์เพิ่มเติม เช่น เปลี่ยนปริมาณ...">
+            <button class="btn btn-primary" style="padding:0 14px;">ส่ง</button>
+          </div>
+        </div>
+
+        <div class="card tips-card">
+          <h3 class="card-title" style="font-size:14.5px;">เคล็ดลับการตั้ง RFQ</h3>
+          <ul>
+            <li>ระบุเกรด/มาตรฐานให้ชัดเจน ลดรอบถามตอบกับผู้ขาย</li>
+            <li>เลือกส่งถึงผู้ขาย 3-5 รายเพื่อเปรียบเทียบราคาได้อย่างมีนัยสำคัญ</li>
+            <li>แนบเอกสารสเปกเดิม ถ้ามี จะได้ใบเสนอราคาที่แม่นยำขึ้น</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="summary-bar">
+      <div class="summary-left">ร่างจะถูกบันทึกอัตโนมัติ · ส่งถึงผู้ขาย 3 ราย</div>
+      <div class="summary-actions">
+        <button class="btn btn-ghost">บันทึกร่าง</button>
+        <button class="btn btn-outline">ย้อนกลับ</button>
+        <button class="btn btn-primary btn-lg">ถัดไป: ยืนยันและส่ง RFQ</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="compare-section">
+    <div class="wrap">
+      <div class="section-eyebrow">ขั้นตอนที่ 4 (ตัวอย่าง)</div>
+      <h2 class="section-title">เปรียบเทียบใบเสนอราคา</h2>
+      <p class="section-sub">เมื่อผู้ขายตอบกลับ ใบเสนอราคาทั้งหมดจะปรากฏในตารางเดียวแบบนี้ ให้เปรียบเทียบและเข้าสู่ Deal Room ได้ทันที</p>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>ผู้ขาย</th>
+            <th>ราคา/กก.</th>
+            <th>เงื่อนไขชำระเงิน</th>
+            <th>ระยะเวลาส่งมอบ</th>
+            <th>Trust Score</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best">
+            <td>บจก. ไทยโพลีไซเคิล <span class="rank-badge">ราคาดีที่สุด</span></td>
+            <td class="mono">36.80 บาท</td>
+            <td>เครดิต 30 วัน</td>
+            <td>7 วัน</td>
+            <td class="mono">4.7/5</td>
+            <td><button class="btn btn-primary" style="padding:7px 14px;font-size:13px;">เจรจาต่อ</button></td>
+          </tr>
+          <tr>
+            <td>เอเชีย พอลิเมอร์</td>
+            <td class="mono">37.80 บาท</td>
+            <td>เครดิต 15 วัน</td>
+            <td>5 วัน</td>
+            <td class="mono">4.5/5</td>
+            <td><button class="btn btn-outline" style="padding:7px 14px;font-size:13px;">เจรจาต่อ</button></td>
+          </tr>
+          <tr>
+            <td>บางกอก คอมพาวนด์</td>
+            <td class="mono">35.90 บาท</td>
+            <td>ชำระก่อนส่ง</td>
+            <td>10 วัน</td>
+            <td class="mono">4.3/5</td>
+            <td><button class="btn btn-outline" style="padding:7px 14px;font-size:13px;">เจรจาต่อ</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
+      <div class="foot-links">
+        <a href="chemlink_homepage.html">หน้าแรก</a>
+        <a href="product.html">หน้าสินค้า</a>
+        <a href="#">ศูนย์ช่วยเหลือ</a>
+        <a href="#">PDPA</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.radio-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+</script>
+
+</body>
+</html>

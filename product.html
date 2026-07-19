@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เม็ดพลาสติก PP รีไซเคิล เกรด Injection — ChemLink Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10181A; --paper:#F1F3EF; --surface:#FFFFFF;
+    --navy:#0C2A2F; --navy-2:#123A40; --navy-3:#1B4C53;
+    --orange:#DD5A26; --orange-ink:#8C3714;
+    --green:#166F58; --green-tint:#E4F1EB; --green-ink:#0F4E3D;
+    --gold:#AD7A24; --gold-tint:#F7EEDC;
+    --red:#AE3A2E; --red-tint:#FBE9E7; --red-ink:#7A2A21;
+    --line:#DBDFD6; --line-on-navy:rgba(255,255,255,0.14);
+    --muted:#5B655F; --muted-on-navy:#A9C2C1;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Thai","IBM Plex Sans",sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;} img,svg{display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .skip-link{position:absolute;left:-999px;top:0;background:var(--orange);color:#fff;padding:10px 16px;z-index:999;border-radius:0 0 6px 0;}
+  .skip-link:focus{left:0;}
+
+  .util-bar{background:var(--navy);color:var(--muted-on-navy);font-size:13px;}
+  .util-bar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;}
+  .util-bar a{text-decoration:none;color:var(--muted-on-navy);}
+  .util-links{display:flex;gap:20px;align-items:center;}
+  .util-links .divider{width:1px;height:12px;background:var(--line-on-navy);}
+
+  .nav{background:var(--surface);border-bottom:0.5px solid var(--line);position:sticky;top:0;z-index:50;}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  .brand-word{font-weight:600;font-size:18px;letter-spacing:-0.01em;}
+  .brand-word span{color:var(--orange);}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500;}
+  .nav-links a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
+  .nav-links a:hover{border-bottom-color:var(--orange);}
+  .nav-cta{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+  .btn{font-family:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);border:1.5px solid transparent;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+  .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
+  .btn-primary:hover{background:var(--orange-ink);border-color:var(--orange-ink);}
+  .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--navy);border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--navy);}
+  .btn-block{width:100%;justify-content:center;}
+  .btn-lg{padding:13px 20px;font-size:15px;}
+
+  /* breadcrumb */
+  .crumb{padding:16px 0;font-size:13px;color:var(--muted);}
+  .crumb a{text-decoration:none;color:var(--muted);}
+  .crumb a:hover{color:var(--navy);}
+  .crumb span{margin:0 6px;}
+
+  /* product header */
+  .product-head{background:var(--surface);border-top:0.5px solid var(--line);border-bottom:0.5px solid var(--line);padding:36px 0 44px;}
+  .ph-grid{display:grid;grid-template-columns:400px 1fr;gap:48px;}
+  .media-main{
+    aspect-ratio:1/1;background:var(--paper);border:0.5px solid var(--line);border-radius:var(--radius-lg);
+    display:flex;align-items:center;justify-content:center;color:var(--navy);margin-bottom:12px;
+  }
+  .media-main svg{width:44%;height:44%;}
+  .media-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .media-thumb{aspect-ratio:1/1;background:var(--paper);border:0.5px solid var(--line);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;}
+  .media-thumb.active{border-color:var(--navy);}
+  .media-thumb svg{width:40%;height:40%;}
+
+  .cat-tag{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--orange-ink);letter-spacing:0.03em;margin-bottom:10px;}
+  .p-title{font-size:28px;font-weight:700;margin:0 0 10px;letter-spacing:-0.01em;line-height:1.3;}
+  .p-sub{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted);margin-bottom:18px;}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .badge{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;}
+  .badge-green{background:var(--green-tint);color:var(--green-ink);}
+  .badge-gold{background:var(--gold-tint);color:var(--gold);}
+  .badge-line{background:var(--surface);color:var(--muted);border:0.5px solid var(--line);}
+
+  .seller-card{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:var(--paper);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:22px;
+  }
+  .seller-left{display:flex;align-items:center;gap:12px;}
+  .seller-avatar{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex-shrink:0;}
+  .seller-name{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .seller-name .dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;}
+  .seller-meta{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .trust-pill{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:var(--green-ink);background:var(--green-tint);padding:6px 12px;border-radius:20px;white-space:nowrap;}
+
+  .spec-quick{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px;}
+  .spec-quick-item{background:var(--paper);border-radius:var(--radius-sm);padding:12px 14px;}
+  .spec-quick-item .k{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  .spec-quick-item .v{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:600;}
+
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* tabs */
+  section{padding:56px 0;}
+  .section-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--orange-ink);letter-spacing:0.04em;margin-bottom:10px;}
+  .section-title{font-size:24px;font-weight:700;margin:0 0 24px;letter-spacing:-0.01em;}
+  .tabbar{display:flex;gap:4px;border-bottom:0.5px solid var(--line);margin-bottom:24px;flex-wrap:wrap;}
+  .tab-btn{
+    font-family:inherit;background:none;border:none;cursor:pointer;padding:12px 18px;font-size:14px;font-weight:500;
+    color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;
+  }
+  .tab-btn.active{color:var(--navy);border-bottom-color:var(--orange);font-weight:600;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .spec-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius-md);overflow:hidden;border:0.5px solid var(--line);}
+  .spec-table tr:not(:last-child) td{border-bottom:0.5px solid var(--line);}
+  .spec-table td{padding:13px 20px;font-size:13.5px;}
+  .spec-table td:first-child{color:var(--muted);width:42%;}
+  .spec-table td:last-child{font-family:"IBM Plex Mono",monospace;font-weight:500;}
+  .tab-prose{font-size:14.5px;line-height:1.8;color:var(--ink);max-width:760px;}
+  .tab-prose ul{padding-left:20px;margin:12px 0;}
+  .tab-prose li{margin-bottom:6px;}
+
+  /* documents */
+  .doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .doc-card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:10px;}
+  .doc-icon{width:34px;height:34px;color:var(--navy);}
+  .doc-name{font-size:14.5px;font-weight:600;}
+  .doc-meta{font-size:12.5px;color:var(--muted);}
+  .doc-trace{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--green-ink);background:var(--green-tint);padding:4px 10px;border-radius:20px;width:fit-content;}
+  .doc-foot{margin-top:auto;padding-top:10px;}
+
+  /* related */
+  .rel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .rel-card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-md);padding:16px;text-decoration:none;color:var(--ink);}
+  .rel-thumb{aspect-ratio:4/3;background:var(--paper);border-radius:var(--radius-sm);margin-bottom:12px;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+  .rel-thumb svg{width:34%;height:34%;}
+  .rel-name{font-size:13.5px;font-weight:600;margin-bottom:4px;line-height:1.4;}
+  .rel-seller{font-size:12px;color:var(--muted);margin-bottom:8px;}
+  .rel-price{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:var(--gold);}
+
+  /* other sellers */
+  .os-list{display:flex;flex-direction:column;gap:10px;}
+  .os-row{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-md);padding:16px 20px;}
+  .os-left{display:flex;align-items:center;gap:14px;}
+  .os-price{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--navy);}
+  .os-unit{font-size:12px;color:var(--muted);}
+
+  footer{background:var(--navy);color:var(--muted-on-navy);padding:56px 0 28px;margin-top:20px;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;flex-wrap:wrap;gap:12px;}
+  .foot-links{display:flex;gap:20px;flex-wrap:wrap;}
+  .foot-links a{text-decoration:none;color:var(--muted-on-navy);}
+  .foot-links a:hover{color:#fff;}
+
+  @media (max-width:980px){
+    .ph-grid{grid-template-columns:1fr;}
+    .spec-quick{grid-template-columns:repeat(2,1fr);}
+    .doc-grid{grid-template-columns:1fr 1fr;}
+    .rel-grid{grid-template-columns:1fr 1fr;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 20px;}
+    .doc-grid{grid-template-columns:1fr;}
+    .rel-grid{grid-template-columns:1fr;}
+    .spec-quick{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+
+<div class="util-bar">
+  <div class="wrap">
+    <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
+    <div class="util-links">
+      <a href="#">TH</a><span class="divider"></span><a href="#">EN</a><span class="divider"></span>
+      <a href="#">ติดต่อฝ่ายขาย</a><span class="divider"></span><a href="#">เข้าสู่ระบบ</a>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="chemlink_homepage.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="7" fill="#0C2A2F"/>
+        <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+      </svg>
+      <span class="brand-word">ChemLink <span>Platform</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="chemlink_homepage.html#categories">หมวดหมู่สินค้า</a>
+      <a href="rfq.html">ค้นหา / RFQ</a>
+      <a href="chemlink_homepage.html#ticker">ดัชนีราคา</a>
+      <a href="#">บริการเสริม</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="#">สมัครเป็นผู้ขาย</a>
+      <a class="btn btn-primary" href="#">สมัครเป็นผู้ซื้อ</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <div class="wrap">
+    <div class="crumb">
+      <a href="chemlink_homepage.html">หน้าแรก</a><span>/</span>
+      <a href="chemlink_homepage.html#categories">เม็ดพลาสติก</a><span>/</span>
+      <span style="color:var(--ink);">PP รีไซเคิล เกรด Injection</span>
+    </div>
+  </div>
+
+  <header class="product-head">
+    <div class="wrap ph-grid">
+      <div>
+        <div class="media-main" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7" cy="8" r="2.4"/><circle cx="16" cy="7" r="2.4"/><circle cx="12" cy="14" r="2.4"/><circle cx="18" cy="16" r="2.4"/><circle cx="6" cy="17" r="2.4"/></svg>
+        </div>
+        <div class="media-thumbs">
+          <div class="media-thumb active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="8"/></svg></div>
+          <div class="media-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+          <div class="media-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 8l8-4 8 4v8l-8 4-8-4V8Z"/></svg></div>
+          <div class="media-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 4h14v16H5z"/></svg></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cat-tag">เม็ดพลาสติก (Resin) · วัสดุรีไซเคิล</div>
+        <h1 class="p-title">เม็ดพลาสติก PP รีไซเคิล เกรด Injection</h1>
+        <div class="p-sub">CAS 9003-07-0 · เลขที่สินค้า CL-PRD-04821</div>
+
+        <div class="badge-row">
+          <span class="badge badge-green">เอกสารครบ SDS · COA · TDS</span>
+          <span class="badge badge-gold">พร้อมส่งภายใน 7 วัน</span>
+          <span class="badge badge-line">มอก. 1888</span>
+        </div>
+
+        <div class="seller-card">
+          <div class="seller-left">
+            <div class="seller-avatar">ทพ</div>
+            <div>
+              <div class="seller-name"><span class="dot" aria-hidden="true"></span> บจก. ไทยโพลีไซเคิล</div>
+              <div class="seller-meta">สมุทรปราการ · ผู้ขายยืนยันตัวตนแล้ว · ก่อตั้ง 2554</div>
+            </div>
+          </div>
+          <span class="trust-pill">Trust Score 4.7/5</span>
+        </div>
+
+        <div class="spec-quick">
+          <div class="spec-quick-item"><div class="k">ความบริสุทธิ์ (Purity)</div><div class="v">99.2%</div></div>
+          <div class="spec-quick-item"><div class="k">ปริมาณขั้นต่ำ (MOQ)</div><div class="v">5,000 กก.</div></div>
+          <div class="spec-quick-item"><div class="k">ราคาอ้างอิง</div><div class="v">36-40 บาท/กก.</div></div>
+        </div>
+
+        <div class="cta-row">
+          <a class="btn btn-primary btn-lg" href="rfq.html">ขอใบเสนอราคา (RFQ)</a>
+          <button class="btn btn-outline btn-lg">ขอตัวอย่างสินค้า</button>
+          <button class="btn btn-ghost btn-lg">แชทกับผู้ขาย</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="specs">
+    <div class="wrap">
+      <div class="section-eyebrow">ข้อมูลทางเทคนิค</div>
+      <h2 class="section-title">รายละเอียดเชิงเทคนิค (Enhanced TDS)</h2>
+
+      <div class="tabbar" role="tablist">
+        <button class="tab-btn active" data-tab="t1">คุณสมบัติทางเคมี-กายภาพ</button>
+        <button class="tab-btn" data-tab="t2">การใช้งาน (Application)</button>
+        <button class="tab-btn" data-tab="t3">มาตรฐาน/กฎระเบียบ</button>
+        <button class="tab-btn" data-tab="t4">การจัดเก็บและขนส่ง</button>
+      </div>
+
+      <div class="tab-panel active" id="t1">
+        <table class="spec-table">
+          <tr><td>ลักษณะ (Appearance)</td><td>Off-white pellet, 3-4mm</td></tr>
+          <tr><td>ความบริสุทธิ์ (Purity)</td><td>99.2%</td></tr>
+          <tr><td>MFI (230°C / 2.16kg)</td><td>8.2 g/10min</td></tr>
+          <tr><td>ความหนาแน่น (Density)</td><td>0.905 g/cm³</td></tr>
+          <tr><td>จุดหลอมเหลว (Melting Point)</td><td>160-165°C</td></tr>
+          <tr><td>ปริมาณความชื้น (Moisture)</td><td>&lt; 0.1%</td></tr>
+          <tr><td>สิ่งเจือปน (Contamination)</td><td>&lt; 0.05%</td></tr>
+        </table>
+      </div>
+      <div class="tab-panel" id="t2">
+        <div class="tab-prose">
+          <p>เหมาะสำหรับกระบวนการฉีดขึ้นรูป (Injection Molding) ที่ต้องการความแข็งแรงเชิงกลระดับกลางถึงสูง นิยมใช้ในกลุ่มผลิตภัณฑ์ต่อไปนี้:</p>
+          <ul>
+            <li>ชิ้นส่วนบรรจุภัณฑ์อุตสาหกรรม (พาเลท, ลัง, กล่องขนส่ง)</li>
+            <li>ชิ้นส่วนยานยนต์ที่ไม่รับแรงกระแทกสูง</li>
+            <li>เครื่องใช้ในครัวเรือนและของใช้ทั่วไป</li>
+          </ul>
+          <p>ไม่แนะนำสำหรับงานที่สัมผัสอาหารโดยตรง เนื่องจากเป็นวัสดุรีไซเคิลระดับอุตสาหกรรม (Post-Industrial Recycled)</p>
+        </div>
+      </div>
+      <div class="tab-panel" id="t3">
+        <table class="spec-table">
+          <tr><td>มาตรฐานผลิตภัณฑ์</td><td>มอก. 1888-2560</td></tr>
+          <tr><td>ระบบบริหารคุณภาพผู้ผลิต</td><td>ISO 9001:2015</td></tr>
+          <tr><td>ระบบสิ่งแวดล้อม</td><td>ISO 14001:2015</td></tr>
+          <tr><td>การจำแนกวัตถุอันตราย</td><td>ไม่จัดเป็นวัตถุอันตรายตาม พ.ร.บ. วัตถุอันตราย</td></tr>
+        </table>
+      </div>
+      <div class="tab-panel" id="t4">
+        <div class="tab-prose">
+          <p>จัดเก็บในพื้นที่แห้ง อุณหภูมิห้อง หลีกเลี่ยงแสงแดดโดยตรง อายุการเก็บรักษา 24 เดือนนับจากวันที่ผลิตเมื่อเก็บตามเงื่อนไขที่กำหนด</p>
+          <p>บรรจุในถุง Jumbo Bag ขนาด 1,000 กก. หรือกระสอบ 25 กก. ตามที่ตกลง รองรับการขนส่งทางรถบรรทุกและตู้คอนเทนเนอร์มาตรฐาน</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="documents" style="background:var(--surface);border-top:0.5px solid var(--line);border-bottom:0.5px solid var(--line);">
+    <div class="wrap">
+      <div class="section-eyebrow">คลังเอกสาร</div>
+      <h2 class="section-title">เอกสารเทคนิคที่ดาวน์โหลดได้</h2>
+      <div class="doc-grid">
+        <div class="doc-card">
+          <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 3h9l5 5v13H6V3Z"/><path d="M15 3v5h5"/><path d="M9 13h6M9 16.5h6"/></svg>
+          <div class="doc-name">Safety Data Sheet (SDS)</div>
+          <div class="doc-meta">ปรับปรุงล่าสุด: 12 มิ.ย. 2569 · PDF, 480 KB</div>
+          <span class="doc-trace"><span aria-hidden="true">●</span> ตรวจสอบย้อนกลับได้</span>
+          <div class="doc-foot"><button class="btn btn-outline btn-block">ดาวน์โหลด</button></div>
+        </div>
+        <div class="doc-card">
+          <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 3h9l5 5v13H6V3Z"/><path d="M15 3v5h5"/><path d="M9 13h6M9 16.5h6"/></svg>
+          <div class="doc-name">Certificate of Analysis (COA)</div>
+          <div class="doc-meta">ปรับปรุงล่าสุด: 2 ก.ค. 2569 · PDF, 210 KB</div>
+          <span class="doc-trace"><span aria-hidden="true">●</span> ตรวจสอบย้อนกลับได้</span>
+          <div class="doc-foot"><button class="btn btn-outline btn-block">ดาวน์โหลด</button></div>
+        </div>
+        <div class="doc-card">
+          <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 3h9l5 5v13H6V3Z"/><path d="M15 3v5h5"/><path d="M9 13h6M9 16.5h6"/></svg>
+          <div class="doc-name">Technical Data Sheet (TDS)</div>
+          <div class="doc-meta">ปรับปรุงล่าสุด: 12 มิ.ย. 2569 · PDF, 340 KB</div>
+          <span class="doc-trace"><span aria-hidden="true">●</span> ตรวจสอบย้อนกลับได้</span>
+          <div class="doc-foot"><button class="btn btn-outline btn-block">ดาวน์โหลด</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="related">
+    <div class="wrap">
+      <div class="section-eyebrow">แนะนำเพิ่มเติม</div>
+      <h2 class="section-title">สินค้าทดแทนที่ใกล้เคียง</h2>
+      <div class="rel-grid">
+        <a class="rel-card" href="#">
+          <div class="rel-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="14" r="2"/></svg></div>
+          <div class="rel-name">PP รีไซเคิล เกรด Extrusion</div>
+          <div class="rel-seller">เอเชีย พอลิเมอร์</div>
+          <div class="rel-price">34-37 บาท/กก.</div>
+        </a>
+        <a class="rel-card" href="#">
+          <div class="rel-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="14" r="2"/></svg></div>
+          <div class="rel-name">HDPE รีไซเคิล เกรด Blow Molding</div>
+          <div class="rel-seller">บางกอก คอมพาวนด์</div>
+          <div class="rel-price">33-36 บาท/กก.</div>
+        </a>
+        <a class="rel-card" href="#">
+          <div class="rel-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="14" r="2"/></svg></div>
+          <div class="rel-name">PP เกรดใหม่ (Virgin) Injection</div>
+          <div class="rel-seller">สยามเคมีคอล กรุ๊ป</div>
+          <div class="rel-price">44-48 บาท/กก.</div>
+        </a>
+        <a class="rel-card" href="#">
+          <div class="rel-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="14" r="2"/></svg></div>
+          <div class="rel-name">PP Compound เสริมใยแก้ว 20%</div>
+          <div class="rel-seller">อีสเทิร์น มิเนอรัล</div>
+          <div class="rel-price">52-58 บาท/กก.</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="other-sellers" style="background:var(--surface);border-top:0.5px solid var(--line);padding-bottom:64px;">
+    <div class="wrap">
+      <div class="section-eyebrow">เปรียบเทียบผู้ขาย</div>
+      <h2 class="section-title">ผู้ขายรายอื่นที่มีสินค้านี้</h2>
+      <div class="os-list">
+        <div class="os-row">
+          <div class="os-left">
+            <div class="seller-avatar" style="width:36px;height:36px;font-size:12px;">อพ</div>
+            <div>
+              <div class="seller-name" style="font-size:14px;"><span class="dot" aria-hidden="true"></span> เอเชีย พอลิเมอร์</div>
+              <div class="seller-meta">ระยอง · ส่งภายใน 5 วัน · MOQ 3,000 กก.</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="os-price">37.80 บาท/กก.</div>
+            <div class="os-unit">Trust Score 4.5/5</div>
+          </div>
+        </div>
+        <div class="os-row">
+          <div class="os-left">
+            <div class="seller-avatar" style="width:36px;height:36px;font-size:12px;">บค</div>
+            <div>
+              <div class="seller-name" style="font-size:14px;"><span class="dot" aria-hidden="true"></span> บางกอก คอมพาวนด์</div>
+              <div class="seller-meta">ปทุมธานี · ส่งภายใน 10 วัน · MOQ 8,000 กก.</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="os-price">35.90 บาท/กก.</div>
+            <div class="os-unit">Trust Score 4.3/5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
+      <div class="foot-links">
+        <a href="chemlink_homepage.html">หน้าแรก</a>
+        <a href="rfq.html">RFQ</a>
+        <a href="#">ศูนย์ช่วยเหลือ</a>
+        <a href="#">PDPA</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+  document.querySelectorAll('.media-thumb').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+      document.querySelectorAll('.media-thumb').forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
