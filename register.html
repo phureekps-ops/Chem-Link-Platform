@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สมัครสมาชิก — ChemLink Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10181A; --paper:#F1F3EF; --surface:#FFFFFF;
+    --navy:#0C2A2F; --navy-2:#123A40;
+    --orange:#DD5A26; --orange-ink:#8C3714; --orange-tint:#FBE6DB;
+    --green:#166F58; --green-tint:#E4F1EB; --green-ink:#0F4E3D;
+    --gold:#AD7A24; --gold-tint:#F7EEDC;
+    --red:#AE3A2E; --red-tint:#FBE9E7; --red-ink:#7A2A21;
+    --line:#DBDFD6; --line-on-navy:rgba(255,255,255,0.14);
+    --muted:#5B655F; --muted-on-navy:#A9C2C1;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Thai","IBM Plex Sans",sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;} img,svg{display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .skip-link{position:absolute;left:-999px;top:0;background:var(--orange);color:#fff;padding:10px 16px;z-index:999;border-radius:0 0 6px 0;}
+  .skip-link:focus{left:0;}
+
+  .util-bar{background:var(--navy);color:var(--muted-on-navy);font-size:13px;}
+  .util-bar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;}
+  .util-bar a{text-decoration:none;color:var(--muted-on-navy);}
+  .util-links{display:flex;gap:20px;align-items:center;}
+  .util-links .divider{width:1px;height:12px;background:var(--line-on-navy);}
+
+  .nav{background:var(--surface);border-bottom:0.5px solid var(--line);position:sticky;top:0;z-index:50;}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  .brand-word{font-weight:600;font-size:18px;letter-spacing:-0.01em;}
+  .brand-word span{color:var(--orange);}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500;}
+  .nav-links a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
+  .nav-links a:hover{border-bottom-color:var(--orange);}
+  .btn{font-family:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);border:1.5px solid transparent;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+  .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
+  .btn-primary:hover{background:var(--orange-ink);border-color:var(--orange-ink);}
+  .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-block{width:100%;justify-content:center;}
+  .btn-lg{padding:13px 20px;font-size:15px;}
+  .btn:disabled{opacity:0.55;cursor:not-allowed;}
+
+  .page-head{background:var(--navy);color:#fff;padding:44px 0 40px;}
+  .page-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted-on-navy);letter-spacing:0.04em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .page-eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange);}
+  .page-title{font-size:28px;font-weight:700;margin:0 0 10px;letter-spacing:-0.01em;}
+  .page-sub{font-size:15px;color:var(--muted-on-navy);max-width:640px;line-height:1.7;}
+
+  .role-hint-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;}
+  .role-hint{background:rgba(255,255,255,0.06);border:1px solid var(--line-on-navy);border-radius:var(--radius-md);padding:12px 16px;font-size:13px;flex:1;min-width:220px;}
+  .role-hint .k{font-weight:600;margin-bottom:3px;}
+  .role-hint .v{color:var(--muted-on-navy);}
+
+  section{padding:44px 0 72px;}
+  .form-layout{display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;}
+  .card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:30px;}
+  .card + .card{margin-top:18px;}
+  .card-title{font-size:16px;font-weight:600;margin:0 0 4px;}
+  .card-sub{font-size:13px;color:var(--muted);margin:0 0 22px;}
+
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .field{margin-bottom:18px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  input[type=text], input[type=email], input[type=password]{
+    width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);
+  }
+  input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(221,90,38,0.12);}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px;}
+  .err{font-size:12px;color:var(--red-ink);margin-top:5px;display:none;}
+
+  .role-pick-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:6px;}
+  .role-card{border:1.5px solid var(--line);border-radius:var(--radius-md);padding:16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;}
+  .role-card.selected{border-color:var(--orange);background:var(--orange-tint);}
+  .role-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--line);flex-shrink:0;margin-top:1px;position:relative;background:var(--surface);}
+  .role-card.selected .role-check{border-color:var(--orange);background:var(--orange);}
+  .role-card.selected .role-check::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+  .role-title{font-size:14.5px;font-weight:600;margin-bottom:3px;}
+  .role-desc{font-size:12.5px;color:var(--muted);line-height:1.5;}
+
+  .divider-label{display:flex;align-items:center;gap:12px;margin:28px 0 20px;font-size:12px;color:var(--muted);}
+  .divider-label::before, .divider-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .password-hint{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .pw-chip{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--paper);color:var(--muted);}
+  .pw-chip.ok{background:var(--green-tint);color:var(--green-ink);}
+
+  .submit-row{margin-top:26px;display:flex;flex-direction:column;gap:12px;}
+  .login-hint{text-align:center;font-size:13.5px;color:var(--muted);}
+  .login-hint a{color:var(--orange-ink);font-weight:600;text-decoration:none;}
+
+  .sidebar-card{position:sticky;top:96px;}
+  .side-list{list-style:none;padding:0;margin:0;}
+  .side-list li{display:flex;gap:10px;font-size:13px;line-height:1.7;padding:10px 0;border-bottom:0.5px solid var(--line);}
+  .side-list li:last-child{border-bottom:none;}
+  .side-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  .trust-note{background:var(--green-tint);border-radius:var(--radius-md);padding:14px 16px;font-size:12.5px;color:var(--green-ink);margin-top:16px;line-height:1.6;}
+
+  .result-panel{display:none;text-align:center;padding:20px 4px;}
+  .result-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+  .result-icon.success{background:var(--green-tint);color:var(--green-ink);}
+  .result-icon.error{background:var(--red-tint);color:var(--red-ink);}
+  .result-title{font-size:17px;font-weight:700;margin:0 0 8px;}
+  .result-sub{font-size:13.5px;color:var(--muted);line-height:1.7;margin:0 0 20px;}
+  .result-detail{background:var(--paper);border-radius:var(--radius-sm);padding:12px 14px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);text-align:left;margin-bottom:20px;white-space:pre-wrap;word-break:break-word;}
+
+  footer{background:var(--navy);color:var(--muted-on-navy);padding:32px 0;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;flex-wrap:wrap;gap:12px;}
+
+  @media (max-width:980px){
+    .form-layout{grid-template-columns:1fr;}
+    .sidebar-card{position:static;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 20px;}
+    .field-row, .role-pick-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+
+<div class="util-bar">
+  <div class="wrap">
+    <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
+    <div class="util-links">
+      <a href="#">TH</a><span class="divider"></span><a href="#">EN</a><span class="divider"></span>
+      <a href="#">ติดต่อฝ่ายขาย</a><span class="divider"></span><a href="login.html">เข้าสู่ระบบ</a>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="7" fill="#0C2A2F"/>
+        <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+      </svg>
+      <span class="brand-word">ChemLink <span>Platform</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#categories">หมวดหมู่สินค้า</a>
+      <a href="rfq.html">ค้นหา / RFQ</a>
+      <a href="index.html#ticker">ดัชนีราคา</a>
+      <a href="#">บริการเสริม</a>
+    </div>
+    <a class="btn btn-outline" href="login.html">เข้าสู่ระบบ</a>
+  </div>
+</nav>
+
+<main id="main">
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="page-eyebrow">สมัครสมาชิก</div>
+      <h1 class="page-title">สร้างบัญชี ChemLink Platform</h1>
+      <p class="page-sub">หนึ่งบัญชีบริษัท เลือกได้ทั้งบทบาทผู้ซื้อและผู้ขายพร้อมกัน — ไม่บังคับเลือกเพียงอย่างเดียว และเพิ่มบทบาทที่สองภายหลังได้ตลอดเวลาโดยไม่ต้องสมัครใหม่</p>
+      <div class="role-hint-row">
+        <div class="role-hint"><div class="k">สำหรับผู้ซื้อ</div><div class="v">ส่ง RFQ เปรียบเทียบใบเสนอราคา ติดตามคู่ค้าที่ยืนยันตัวตนแล้ว</div></div>
+        <div class="role-hint"><div class="k">สำหรับผู้ขาย</div><div class="v">รับ RFQ ที่ตรงสเปกอัตโนมัติ สร้างแคตตาล็อกจากเอกสารที่มีอยู่แล้ว</div></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <div class="form-layout">
+
+        <div>
+          <div class="card" id="form-card">
+            <h2 class="card-title">ข้อมูลบริษัท</h2>
+            <p class="card-sub">ใช้ข้อมูลนิติบุคคลตามหนังสือรับรองบริษัท เพื่อความรวดเร็วในขั้นตอนยืนยันตัวตน</p>
+
+            <form id="register-form" novalidate>
+              <div class="field">
+                <label for="companyLegalName">ชื่อนิติบุคคล</label>
+                <input type="text" id="companyLegalName" name="companyLegalName" placeholder="บจก. ตัวอย่างเคมีคอล" required>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="companyTaxId">เลขประจำตัวผู้เสียภาษี</label>
+                  <input type="text" id="companyTaxId" name="companyTaxId" placeholder="0105500000000" required>
+                </div>
+                <div class="field">
+                  <label for="companyProvince">จังหวัด</label>
+                  <input type="text" id="companyProvince" name="companyProvince" placeholder="สมุทรปราการ">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="companyAddress">ที่อยู่บริษัท</label>
+                <input type="text" id="companyAddress" name="companyAddress" placeholder="เลขที่ ถนน ตำบล/แขวง อำเภอ/เขต">
+              </div>
+
+              <div class="field">
+                <label>บริษัทของท่านต้องการใช้งานแพลตฟอร์มในบทบาทใดบ้าง</label>
+                <div class="role-pick-row">
+                  <div class="role-card" data-role="BUYER" id="role-buyer">
+                    <div class="role-check" aria-hidden="true"></div>
+                    <div>
+                      <div class="role-title">ผู้ซื้อ (Buyer)</div>
+                      <div class="role-desc">ค้นหาซัพพลายเออร์และส่งคำขอใบเสนอราคา</div>
+                    </div>
+                  </div>
+                  <div class="role-card" data-role="SELLER" id="role-seller">
+                    <div class="role-check" aria-hidden="true"></div>
+                    <div>
+                      <div class="role-title">ผู้ขาย (Seller)</div>
+                      <div class="role-desc">ลงประกาศสินค้าและรับคำขอใบเสนอราคา</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="err" id="role-error">กรุณาเลือกอย่างน้อย 1 บทบาท</div>
+              </div>
+
+              <div class="divider-label">ข้อมูลผู้ดูแลบัญชี (ผู้ใช้งานคนแรก)</div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="fullName">ชื่อ-นามสกุล</label>
+                  <input type="text" id="fullName" name="fullName" placeholder="สมชาย วิริยะ" required>
+                </div>
+                <div class="field">
+                  <label for="position">ตำแหน่ง</label>
+                  <input type="text" id="position" name="position" placeholder="กรรมการผู้จัดการ">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="email">อีเมลบริษัท</label>
+                <input type="email" id="email" name="email" placeholder="owner@company.example" required>
+              </div>
+
+              <div class="field">
+                <label for="password">รหัสผ่าน</label>
+                <input type="password" id="password" name="password" placeholder="อย่างน้อย 8 ตัวอักษร" required minlength="8">
+                <div class="password-hint">
+                  <span class="pw-chip" id="pw-len">อย่างน้อย 8 ตัวอักษร</span>
+                </div>
+              </div>
+
+              <div class="submit-row">
+                <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-btn">สร้างบัญชี</button>
+                <div class="login-hint">มีบัญชีอยู่แล้ว? <a href="login.html">เข้าสู่ระบบ</a></div>
+              </div>
+            </form>
+          </div>
+
+          <div class="card result-panel" id="result-success">
+            <div class="result-icon success">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <h3 class="result-title">สร้างบัญชีสำเร็จ</h3>
+            <p class="result-sub" id="result-success-sub">บริษัทของคุณถูกลงทะเบียนเรียบร้อยแล้ว ทีมงานจะดำเนินการตรวจสอบยืนยันตัวตนตามเอกสารที่แจ้งไว้</p>
+            <div class="result-detail" id="result-detail"></div>
+            <button class="btn btn-outline btn-block" onclick="location.reload()">สมัครบัญชีใหม่</button>
+          </div>
+
+          <div class="card result-panel" id="result-error">
+            <div class="result-icon error">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <h3 class="result-title">สมัครสมาชิกไม่สำเร็จ</h3>
+            <p class="result-sub" id="result-error-sub">โปรดตรวจสอบข้อมูลแล้วลองใหม่อีกครั้ง</p>
+            <button class="btn btn-outline btn-block" onclick="showForm()">กลับไปแก้ไขข้อมูล</button>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="card">
+            <h3 class="card-title" style="font-size:14.5px;">ขั้นตอนหลังสมัคร</h3>
+            <ul class="side-list">
+              <li><span class="side-num">1</span> ระบบสร้างบัญชีบริษัทและบัญชีผู้ดูแลทันที</li>
+              <li><span class="side-num">2</span> อัปโหลดเอกสารยืนยันตัวตนตามบทบาทที่เลือก (ทะเบียนบริษัท / ใบอนุญาตวัตถุอันตรายสำหรับผู้ขาย)</li>
+              <li><span class="side-num">3</span> ทีมงานตรวจสอบและอนุมัติ Trust Score เริ่มต้น</li>
+              <li><span class="side-num">4</span> เริ่มค้นหาสินค้า หรือ ลงประกาศสินค้าได้ทันที</li>
+            </ul>
+            <div class="trust-note">เพิ่มบทบาทที่สองได้ภายหลังจากหน้าตั้งค่าบริษัท โดยไม่ต้องสมัครบัญชีใหม่ (Section 14.1)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
+      <span class="mono">API: <span id="api-base-label"></span></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Points at a locally-running backend (see chemlink-backend/README.md --
+  // `docker compose up --build`). Change this if you deploy the API
+  // somewhere other than localhost:3000.
+  const API_BASE_URL = 'http://localhost:3000/api/v1';
+  document.getElementById('api-base-label').textContent = API_BASE_URL;
+
+  const selectedRoles = new Set();
+  document.querySelectorAll('.role-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const role = card.dataset.role;
+      card.classList.toggle('selected');
+      if (selectedRoles.has(role)) selectedRoles.delete(role);
+      else selectedRoles.add(role);
+      document.getElementById('role-error').style.display = 'none';
+    });
+  });
+
+  const params = new URLSearchParams(location.search);
+  const preselect = params.get('role');
+  if (preselect === 'buyer') document.getElementById('role-buyer').click();
+  if (preselect === 'seller') document.getElementById('role-seller').click();
+
+  document.getElementById('password').addEventListener('input', (e) => {
+    document.getElementById('pw-len').classList.toggle('ok', e.target.value.length >= 8);
+  });
+
+  function showForm() {
+    document.getElementById('form-card').style.display = 'block';
+    document.getElementById('result-success').style.display = 'none';
+    document.getElementById('result-error').style.display = 'none';
+  }
+
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (selectedRoles.size === 0) {
+      document.getElementById('role-error').style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังสร้างบัญชี...';
+
+    const payload = {
+      companyLegalName: document.getElementById('companyLegalName').value,
+      companyTaxId: document.getElementById('companyTaxId').value,
+      companyAddress: document.getElementById('companyAddress').value || undefined,
+      companyProvince: document.getElementById('companyProvince').value || undefined,
+      roles: Array.from(selectedRoles),
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value,
+      fullName: document.getElementById('fullName').value,
+      position: document.getElementById('position').value || undefined,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        const message = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'เกิดข้อผิดพลาด');
+        throw new Error(message);
+      }
+
+      document.getElementById('form-card').style.display = 'none';
+      document.getElementById('result-success-sub').textContent =
+        `บริษัท "${data.company.legalName}" ถูกลงทะเบียนในบทบาท ${data.company.roles.join(', ')} เรียบร้อยแล้ว`;
+      document.getElementById('result-detail').textContent =
+        `userId: ${data.user.id}\ncompanyId: ${data.company.id}\naccessToken: ${data.accessToken.slice(0, 24)}...`;
+      document.getElementById('result-success').style.display = 'block';
+
+      if (data.accessToken) {
+        localStorage.setItem('chemlink_access_token', data.accessToken);
+        localStorage.setItem('chemlink_refresh_token', data.refreshToken);
+      }
+    } catch (err) {
+      document.getElementById('form-card').style.display = 'none';
+      const isNetworkError = err instanceof TypeError;
+      document.getElementById('result-error-sub').textContent = isNetworkError
+        ? `เชื่อมต่อ API ที่ ${API_BASE_URL} ไม่ได้ -- ตรวจสอบว่ารัน backend อยู่ (docker compose up) และเปิดหน้านี้จากเครื่องเดียวกัน`
+        : err.message;
+      document.getElementById('result-error').style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'สร้างบัญชี';
+    }
+  });
+</script>
+
+</body>
+</html>
