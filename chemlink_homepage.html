@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจร</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10181A;
+    --paper:#F1F3EF;
+    --surface:#FFFFFF;
+    --navy:#0C2A2F;
+    --navy-2:#123A40;
+    --navy-3:#1B4C53;
+    --orange:#DD5A26;
+    --orange-ink:#8C3714;
+    --green:#166F58;
+    --green-tint:#E4F1EB;
+    --green-ink:#0F4E3D;
+    --gold:#AD7A24;
+    --gold-tint:#F7EEDC;
+    --red:#AE3A2E;
+    --line:#DBDFD6;
+    --line-on-navy:rgba(255,255,255,0.14);
+    --muted:#5B655F;
+    --muted-on-navy:#A9C2C1;
+    --radius-sm:6px;
+    --radius-md:10px;
+    --radius-lg:16px;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans Thai","IBM Plex Sans",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;}
+  img,svg{display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .skip-link{position:absolute;left:-999px;top:0;background:var(--orange);color:#fff;padding:10px 16px;z-index:999;border-radius:0 0 6px 0;}
+  .skip-link:focus{left:0;}
+
+  /* utility bar */
+  .util-bar{background:var(--navy);color:var(--muted-on-navy);font-size:13px;}
+  .util-bar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;}
+  .util-bar a{text-decoration:none;color:var(--muted-on-navy);}
+  .util-bar a:hover{color:#fff;}
+  .util-links{display:flex;gap:20px;align-items:center;}
+  .util-links .divider{width:1px;height:12px;background:var(--line-on-navy);}
+
+  /* main nav */
+  .nav{background:var(--surface);border-bottom:0.5px solid var(--line);position:sticky;top:0;z-index:50;}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  .brand-mark{width:34px;height:34px;flex-shrink:0;}
+  .brand-word{font-weight:600;font-size:18px;letter-spacing:-0.01em;}
+  .brand-word span{color:var(--orange);}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500;}
+  .nav-links a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
+  .nav-links a:hover{border-bottom-color:var(--orange);}
+  .nav-cta{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+  .btn{
+    font-family:inherit;font-size:14px;font-weight:600;
+    padding:10px 18px;border-radius:var(--radius-sm);
+    border:1.5px solid transparent;cursor:pointer;
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+    white-space:nowrap;
+  }
+  .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
+  .btn-primary:hover{background:var(--orange-ink);border-color:var(--orange-ink);}
+  .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-outline-light{background:transparent;color:#fff;border-color:var(--line-on-navy);}
+  .btn-outline-light:hover{background:rgba(255,255,255,0.08);border-color:#fff;}
+  .btn-block{width:100%;justify-content:center;}
+  .menu-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
+  .menu-toggle span{display:block;width:22px;height:2px;background:var(--ink);margin:5px 0;}
+
+  /* hero */
+  .hero{background:var(--navy);color:#fff;position:relative;overflow:hidden;}
+  .hero-grid-bg{
+    position:absolute;inset:0;opacity:0.35;pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-on-navy) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-on-navy) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+  }
+  .hero .wrap{position:relative;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;padding-top:72px;padding-bottom:72px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:0.04em;
+    color:var(--muted-on-navy);text-transform:uppercase;
+    display:flex;align-items:center;gap:8px;margin-bottom:20px;
+  }
+  .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange);}
+  .hero h1{
+    font-size:44px;line-height:1.18;font-weight:700;margin:0 0 20px;letter-spacing:-0.01em;
+  }
+  .hero h1 em{font-style:normal;color:#F3A784;}
+  .hero-sub{font-size:16.5px;line-height:1.7;color:var(--muted-on-navy);max-width:520px;margin:0 0 32px;}
+  .search-panel{background:rgba(255,255,255,0.06);border:1px solid var(--line-on-navy);border-radius:var(--radius-md);padding:16px;margin-bottom:14px;}
+  .search-row{display:flex;gap:10px;}
+  .search-row input{
+    flex:1;height:46px;border-radius:var(--radius-sm);border:1px solid var(--line-on-navy);
+    background:rgba(255,255,255,0.95);color:var(--ink);padding:0 16px;font-size:14.5px;font-family:inherit;
+  }
+  .search-row input::placeholder{color:var(--muted);}
+  .search-row .btn{height:46px;}
+  .search-hint{font-size:13px;color:var(--muted-on-navy);margin:12px 2px 0;}
+  .search-hint a{color:#F3A784;text-decoration:none;font-weight:500;}
+  .search-hint a:hover{text-decoration:underline;}
+  .stat-row{display:flex;gap:36px;margin-top:36px;flex-wrap:wrap;}
+  .stat-item .stat-num{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:#fff;}
+  .stat-item .stat-label{font-size:12.5px;color:var(--muted-on-navy);margin-top:4px;}
+
+  /* COA hero card */
+  .coa-wrap{position:relative;}
+  .coa-card{
+    background:var(--surface);color:var(--ink);border-radius:var(--radius-lg);
+    padding:26px 26px 22px;position:relative;overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .coa-sweep{
+    position:absolute;left:0;right:0;height:60%;top:-60%;
+    background:linear-gradient(180deg, rgba(219,90,38,0.14), transparent);
+    animation:sweep 2.2s ease-out 0.3s 1;
+  }
+  @keyframes sweep{ to{ top:100%; } }
+  @media (prefers-reduced-motion: reduce){ .coa-sweep{ animation:none; display:none; } }
+  .coa-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:14px;margin-bottom:14px;}
+  .coa-title{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:0.06em;color:var(--muted);}
+  .coa-doc{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin-top:4px;}
+  .coa-badge{background:var(--green-tint);color:var(--green-ink);font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;font-family:"IBM Plex Mono",monospace;}
+  .coa-product{font-size:19px;font-weight:600;margin:0 0 2px;}
+  .coa-cas{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+  .coa-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--line);font-size:13.5px;}
+  .coa-row:last-of-type{border-bottom:none;}
+  .coa-row .k{color:var(--muted);}
+  .coa-row .v{font-family:"IBM Plex Mono",monospace;font-weight:500;}
+  .coa-row .v.ok{color:var(--green-ink);}
+  .coa-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+  .coa-verify{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--green-ink);font-weight:600;}
+  .stamp{
+    width:66px;height:66px;border:2px dashed var(--green);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    transform:rotate(-10deg);color:var(--green-ink);flex-shrink:0;
+  }
+  .stamp span{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;line-height:1.3;}
+  .coa-float-chip{
+    position:absolute;background:var(--surface);border-radius:var(--radius-md);
+    padding:10px 14px;box-shadow:0 12px 28px rgba(0,0,0,0.28);font-size:12.5px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .coa-float-chip.a{ top:-16px; right:18px; }
+  .coa-float-chip.b{ bottom:-18px; left:-14px; }
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .dot.green{background:var(--green);}
+  .dot.gold{background:var(--gold);}
+
+  /* ticker */
+  .ticker-band{background:var(--navy-2);border-top:1px solid var(--line-on-navy);border-bottom:1px solid var(--line-on-navy);overflow:hidden;}
+  .ticker-track{display:flex;width:max-content;animation:ticker 32s linear infinite;}
+  @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; overflow-x:auto; } }
+  @keyframes ticker{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .ticker-item{
+    display:flex;align-items:center;gap:10px;padding:12px 28px;
+    font-family:"IBM Plex Mono",monospace;font-size:13px;color:#E7ECE9;
+    border-right:1px solid var(--line-on-navy);white-space:nowrap;
+  }
+  .ticker-item .name{color:#fff;font-weight:500;}
+  .ticker-item .price{color:var(--muted-on-navy);}
+  .ticker-item .up{color:#7FC9A6;}
+  .ticker-item .down{color:#E39A8E;}
+
+  /* section shell */
+  section{padding:76px 0;}
+  .section-head{max-width:640px;margin-bottom:44px;}
+  .section-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--orange-ink);letter-spacing:0.04em;margin-bottom:10px;}
+  .section-head h2{font-size:30px;font-weight:700;margin:0 0 12px;letter-spacing:-0.01em;}
+  .section-head p{font-size:15.5px;color:var(--muted);line-height:1.7;margin:0;}
+
+  /* categories */
+  .cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  .cat-card{
+    background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-md);
+    padding:22px 18px;text-decoration:none;color:var(--ink);
+    transition:border-color .15s, transform .15s;
+  }
+  .cat-card:hover{border-color:var(--navy);transform:translateY(-2px);}
+  .cat-icon{width:30px;height:30px;color:var(--navy);margin-bottom:16px;}
+  .cat-name{font-size:14.5px;font-weight:600;margin-bottom:4px;line-height:1.4;}
+  .cat-count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);}
+
+  /* how it works */
+  .flow-wrap{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:44px 40px;}
+  .flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+  .flow-steps::before{
+    content:"";position:absolute;top:22px;left:11%;right:11%;height:1px;
+    background:repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px);
+  }
+  .flow-step{position:relative;padding-right:20px;}
+  .flow-num{
+    width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;
+    font-weight:600;font-size:16px;margin-bottom:18px;position:relative;z-index:1;
+  }
+  .flow-step h3{font-size:15.5px;font-weight:600;margin:0 0 8px;}
+  .flow-step p{font-size:13.5px;color:var(--muted);line-height:1.6;margin:0;}
+
+  /* trust band */
+  .trust-band{background:var(--navy);color:#fff;}
+  .trust-top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-bottom:36px;}
+  .trust-top h2{font-size:26px;font-weight:700;margin:0 0 8px;}
+  .trust-top p{color:var(--muted-on-navy);font-size:14.5px;margin:0;max-width:480px;}
+  .score-chips{display:flex;gap:12px;flex-wrap:wrap;}
+  .score-chip{
+    background:rgba(255,255,255,0.06);border:1px solid var(--line-on-navy);border-radius:var(--radius-md);
+    padding:14px 16px;font-size:12.5px;min-width:150px;
+  }
+  .score-chip .pct{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
+  .score-chip .lbl{color:var(--muted-on-navy);}
+  .seller-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .seller-chip{
+    background:rgba(255,255,255,0.04);border:1px solid var(--line-on-navy);border-radius:var(--radius-sm);
+    padding:14px 20px;font-size:14px;font-weight:600;color:#E7ECE9;display:flex;align-items:center;gap:8px;
+  }
+  .seller-chip .dot.green{box-shadow:0 0 0 3px rgba(22,111,88,0.25);}
+
+  /* dual CTA */
+  .dual-cta{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .cta-panel{border-radius:var(--radius-lg);padding:40px 36px;}
+  .cta-panel.buyer{background:var(--gold-tint);}
+  .cta-panel.seller{background:var(--green-tint);}
+  .cta-tag{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:0.04em;margin-bottom:14px;display:inline-block;padding:4px 10px;border-radius:20px;}
+  .cta-panel.buyer .cta-tag{background:#fff;color:var(--gold);}
+  .cta-panel.seller .cta-tag{background:#fff;color:var(--green);}
+  .cta-panel h3{font-size:22px;font-weight:700;margin:0 0 14px;}
+  .cta-list{list-style:none;padding:0;margin:0 0 26px;}
+  .cta-list li{font-size:14px;line-height:1.7;padding-left:22px;position:relative;color:var(--ink);}
+  .cta-list li::before{content:"";position:absolute;left:0;top:9px;width:10px;height:1.5px;background:var(--ink);opacity:0.4;}
+
+  /* footer */
+  footer{background:var(--navy);color:var(--muted-on-navy);padding-top:64px;}
+  .foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:32px;padding-bottom:44px;border-bottom:1px solid var(--line-on-navy);}
+  .foot-brand p{font-size:13.5px;line-height:1.7;max-width:260px;margin:14px 0 20px;}
+  .foot-col h4{font-size:12.5px;color:#fff;font-weight:600;margin:0 0 16px;letter-spacing:0.02em;}
+  .foot-col ul{list-style:none;padding:0;margin:0;}
+  .foot-col li{margin-bottom:11px;}
+  .foot-col a{font-size:13.5px;color:var(--muted-on-navy);text-decoration:none;}
+  .foot-col a:hover{color:#fff;}
+  .newsletter{display:flex;gap:8px;margin-top:6px;}
+  .newsletter input{
+    flex:1;height:42px;border-radius:var(--radius-sm);border:1px solid var(--line-on-navy);
+    background:rgba(255,255,255,0.06);color:#fff;padding:0 14px;font-size:13px;font-family:inherit;
+  }
+  .newsletter input::placeholder{color:var(--muted-on-navy);}
+  .compliance-row{display:flex;gap:10px;flex-wrap:wrap;padding:28px 0;border-bottom:1px solid var(--line-on-navy);}
+  .compliance-badge{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;border:1px solid var(--line-on-navy);
+    border-radius:20px;padding:6px 14px;color:var(--muted-on-navy);
+  }
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding:22px 0 28px;font-size:12.5px;flex-wrap:wrap;gap:12px;}
+
+  @media (max-width: 1040px){
+    .cat-grid{grid-template-columns:repeat(3,1fr);}
+    .hero .wrap{grid-template-columns:1fr;}
+    .coa-wrap{max-width:460px;}
+    .foot-top{grid-template-columns:1.2fr 1fr 1fr;row-gap:32px;}
+  }
+  @media (max-width: 760px){
+    .wrap{padding:0 20px;}
+    .nav-links, .util-links{display:none;}
+    .menu-toggle{display:block;}
+    .hero h1{font-size:32px;}
+    .stat-row{gap:24px;}
+    .cat-grid{grid-template-columns:repeat(2,1fr);}
+    .flow-steps{grid-template-columns:1fr;gap:28px;}
+    .flow-steps::before{display:none;}
+    .dual-cta{grid-template-columns:1fr;}
+    .foot-top{grid-template-columns:1fr 1fr;}
+    .trust-top{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+
+<div class="util-bar">
+  <div class="wrap">
+    <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
+    <div class="util-links">
+      <a href="#">TH</a>
+      <span class="divider"></span>
+      <a href="#">EN</a>
+      <span class="divider"></span>
+      <a href="#">ติดต่อฝ่ายขาย</a>
+      <span class="divider"></span>
+      <a href="#">เข้าสู่ระบบ</a>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#main">
+      <svg class="brand-mark" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="7" fill="#0C2A2F"/>
+        <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+      </svg>
+      <span class="brand-word">ChemLink <span>Platform</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#categories">หมวดหมู่สินค้า</a>
+      <a href="#flow">ค้นหา / RFQ</a>
+      <a href="#ticker">ดัชนีราคา</a>
+      <a href="#">บริการเสริม</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="#">สมัครเป็นผู้ขาย</a>
+      <a class="btn btn-primary" href="#">สมัครเป็นผู้ซื้อ</a>
+    </div>
+    <button class="menu-toggle" aria-label="เปิดเมนู" onclick="document.getElementById('mnav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<main id="main">
+
+  <header class="hero">
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจร</div>
+        <h1>ค้นหา เปรียบเทียบ ต่อรอง<br>ซื้อขายเคมีภัณฑ์ <em>ในที่เดียว</em></h1>
+        <p class="hero-sub">แพลตฟอร์มกลางสำหรับผู้ซื้อและผู้ขายในอุตสาหกรรมปิโตรเคมี พลาสติก แร่ธาตุ และวัสดุรีไซเคิล ตรวจสอบตัวตนคู่ค้าได้จริง พร้อมเอกสาร SDS/COA/TDS และเทียบใบเสนอราคาได้ในหน้าเดียว</p>
+        <div class="search-panel">
+          <div class="search-row">
+            <input type="text" placeholder="ค้นหาสินค้า เช่น PP รีไซเคิล, Caustic Soda 32%, TiO2 Rutile" aria-label="ค้นหาสินค้า">
+            <button class="btn btn-primary">ค้นหา</button>
+          </div>
+          <p class="search-hint">หรือพิมพ์ความต้องการเป็นประโยคเดียว แล้วให้ <a href="#">Sourcing Assistant ช่วยจัดทำ RFQ ให้ →</a></p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <div class="stat-num">1,240+</div>
+            <div class="stat-label">ผู้ขายยืนยันตัวตนแล้ว</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">3,600+</div>
+            <div class="stat-label">RFQ ต่อเดือน</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">10</div>
+            <div class="stat-label">หมวดสินค้าอุตสาหกรรม</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="coa-wrap">
+        <div class="coa-float-chip a"><span class="dot gold" aria-hidden="true"></span> ดัชนีราคาอัปเดตวันนี้</div>
+        <div class="coa-card">
+          <div class="coa-sweep" aria-hidden="true"></div>
+          <div class="coa-top">
+            <div>
+              <div class="coa-title">CERTIFICATE OF ANALYSIS</div>
+              <div class="coa-doc">เลขที่เอกสาร CL-2026-00218</div>
+            </div>
+            <span class="coa-badge">ยืนยันแล้ว</span>
+          </div>
+          <div class="coa-product">เม็ดพลาสติก PP รีไซเคิล เกรด Injection</div>
+          <div class="coa-cas">CAS 9003-07-0 · ผู้ขาย: บจก. ไทยโพลีไซเคิล (Verified)</div>
+          <div class="coa-row"><span class="k">ความบริสุทธิ์ (Purity)</span><span class="v ok">99.2%</span></div>
+          <div class="coa-row"><span class="k">MFI (230°C/2.16kg)</span><span class="v">8.2 g/10min</span></div>
+          <div class="coa-row"><span class="k">ลักษณะ (Appearance)</span><span class="v">Off-white pellet</span></div>
+          <div class="coa-row"><span class="k">ปริมาณขั้นต่ำ (MOQ)</span><span class="v">5,000 กก.</span></div>
+          <div class="coa-foot">
+            <div class="coa-verify">
+              <span class="dot green" aria-hidden="true"></span> ตรวจสอบเอกสารโดย ChemLink
+            </div>
+            <div class="stamp"><span>VERIFIED<br>2026</span></div>
+          </div>
+        </div>
+        <div class="coa-float-chip b"><span class="dot green" aria-hidden="true"></span> Trust Score 4.7/5</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="ticker-band" id="ticker" aria-label="ดัชนีราคาตลาดวันนี้">
+    <div class="ticker-track">
+      <span class="ticker-item"><span class="name">PP Recycled Pellet</span><span class="price">38.20 บาท/กก.</span><span class="up">▲ 1.4%</span></span>
+      <span class="ticker-item"><span class="name">Caustic Soda 32%</span><span class="price">11.85 บาท/กก.</span><span class="down">▼ 0.6%</span></span>
+      <span class="ticker-item"><span class="name">HDPE Blow Grade</span><span class="price">34.50 บาท/กก.</span><span class="up">▲ 0.8%</span></span>
+      <span class="ticker-item"><span class="name">TiO2 Rutile Grade</span><span class="price">92.10 บาท/กก.</span><span class="down">▼ 1.1%</span></span>
+      <span class="ticker-item"><span class="name">LLDPE Film Grade</span><span class="price">36.90 บาท/กก.</span><span class="up">▲ 0.3%</span></span>
+      <span class="ticker-item"><span class="name">Sulfuric Acid 98%</span><span class="price">8.40 บาท/กก.</span><span class="up">▲ 2.0%</span></span>
+      <span class="ticker-item"><span class="name">PP Recycled Pellet</span><span class="price">38.20 บาท/กก.</span><span class="up">▲ 1.4%</span></span>
+      <span class="ticker-item"><span class="name">Caustic Soda 32%</span><span class="price">11.85 บาท/กก.</span><span class="down">▼ 0.6%</span></span>
+      <span class="ticker-item"><span class="name">HDPE Blow Grade</span><span class="price">34.50 บาท/กก.</span><span class="up">▲ 0.8%</span></span>
+      <span class="ticker-item"><span class="name">TiO2 Rutile Grade</span><span class="price">92.10 บาท/กก.</span><span class="down">▼ 1.1%</span></span>
+      <span class="ticker-item"><span class="name">LLDPE Film Grade</span><span class="price">36.90 บาท/กก.</span><span class="up">▲ 0.3%</span></span>
+      <span class="ticker-item"><span class="name">Sulfuric Acid 98%</span><span class="price">8.40 บาท/กก.</span><span class="up">▲ 2.0%</span></span>
+    </div>
+  </div>
+
+  <section id="categories">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">แคตตาล็อกสินค้า</div>
+        <h2>หมวดหมู่สินค้าอุตสาหกรรม</h2>
+        <p>ครอบคลุมตั้งแต่วัตถุดิบต้นน้ำไปจนถึงวัสดุรีไซเคิล พร้อมเอกสารเทคนิคครบทุกรายการ</p>
+      </div>
+      <div class="cat-grid">
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 3h6M10 3v5.2L4.8 17a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 8.2V3"/><path d="M7.5 14h9"/></svg>
+          <div class="cat-name">ปิโตรเคมีขั้นต้น-ขั้นกลาง</div>
+          <div class="cat-count mono">186 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7" cy="8" r="2.2"/><circle cx="16" cy="7" r="2.2"/><circle cx="12" cy="14" r="2.2"/><circle cx="18" cy="16" r="2.2"/><circle cx="6" cy="17" r="2.2"/></svg>
+          <div class="cat-name">เม็ดพลาสติก (Resin)</div>
+          <div class="cat-count mono">312 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2.5c3 3.6 5.5 7 5.5 10.3a5.5 5.5 0 1 1-11 0c0-3.3 2.5-6.7 5.5-10.3Z"/></svg>
+          <div class="cat-name">เคมีภัณฑ์อุตสาหกรรมทั่วไป</div>
+          <div class="cat-count mono">274 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="9" width="16" height="10" rx="1.2"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
+          <div class="cat-name">วัตถุดิบสีและสารเคลือบผิว</div>
+          <div class="cat-count mono">98 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 4h9l5 5v11H5V4Z"/><path d="M14 4v5h5"/><path d="M8.5 13h7M8.5 16.5h7"/></svg>
+          <div class="cat-name">เคมีภัณฑ์อุตสาหกรรมกระดาษ</div>
+          <div class="cat-count mono">61 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 15c2-6 5-10 8-10s6 4 8 10"/><path d="M4 15h16v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z"/></svg>
+          <div class="cat-name">วัตถุดิบสินค้าอุปโภคบริโภค</div>
+          <div class="cat-count mono">140 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4V8Z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>
+          <div class="cat-name">บรรจุภัณฑ์อุตสาหกรรม</div>
+          <div class="cat-count mono">205 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2 4 8l3.2 12h9.6L20 8 12 2Z"/><path d="M12 2v20M4 8h16"/></svg>
+          <div class="cat-name">แร่ธาตุอุตสาหกรรม</div>
+          <div class="cat-count mono">77 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M17 4a5 5 0 0 0-5 5v2M7 20a5 5 0 0 0 5-5v-2"/><path d="M14 3l3 1-1 3M10 21l-3-1 1-3"/><path d="M12 9v6"/></svg>
+          <div class="cat-name">วัสดุรีไซเคิล</div>
+          <div class="cat-count mono">231 ผู้ขาย</div>
+        </a>
+
+        <a class="cat-card" href="#">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17"/></svg>
+          <div class="cat-name">สารเคมีนำเข้าเฉพาะทาง</div>
+          <div class="cat-count mono">54 ผู้ขาย</div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="flow" style="background:var(--surface);border-top:0.5px solid var(--line);border-bottom:0.5px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">วิธีใช้งาน</div>
+        <h2>จากคำขอ RFQ ถึงปิดดีล ใน 4 ขั้นตอน</h2>
+        <p>ออกแบบให้ทีมจัดซื้อส่งคำขอได้เร็ว และทีมขายตอบกลับได้ทันโดยไม่ต้องออกจากแพลตฟอร์ม</p>
+      </div>
+      <div class="flow-wrap">
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-num">1</div>
+            <h3>ระบุความต้องการ</h3>
+            <p>กรอกสเปกหรือพิมพ์กับ Sourcing Assistant เลือกส่งถึงผู้ขายหลายรายพร้อมกัน</p>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">2</div>
+            <h3>รับใบเสนอราคา</h3>
+            <p>ผู้ขายที่ตรงสเปกได้รับแจ้งเตือนทันที พร้อมส่งราคาและเอกสารเทคนิคกลับ</p>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">3</div>
+            <h3>เปรียบเทียบและต่อรอง</h3>
+            <p>ดูใบเสนอราคาทุกรายในตารางเดียว แล้วเจรจาต่อใน Deal Room</p>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">4</div>
+            <h3>ปิดดีลและให้คะแนน</h3>
+            <p>บันทึกผลลัพธ์เข้าประวัติคู่ค้า และให้คะแนนความน่าเชื่อถือหลังส่งมอบ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-band">
+    <div class="wrap">
+      <div class="trust-top">
+        <div>
+          <h2>ความน่าเชื่อถือ ตรวจสอบได้จริง</h2>
+          <p>ทุกบริษัทผ่านการยืนยันตัวตนและประเมินคะแนนจากธุรกรรมจริงบนแพลตฟอร์ม</p>
+        </div>
+        <div class="score-chips">
+          <div class="score-chip"><div class="pct">30%</div><div class="lbl">คะแนนยืนยันตัวตน</div></div>
+          <div class="score-chip"><div class="pct">50%</div><div class="lbl">คะแนนรีวิวจากคู่ค้า</div></div>
+          <div class="score-chip"><div class="pct">20%</div><div class="lbl">คะแนนพฤติกรรมการใช้งาน</div></div>
+        </div>
+      </div>
+      <div class="seller-row">
+        <span class="seller-chip"><span class="dot green" aria-hidden="true"></span>ไทยโพลีไซเคิล</span>
+        <span class="seller-chip"><span class="dot green" aria-hidden="true"></span>สยามเคมีคอล กรุ๊ป</span>
+        <span class="seller-chip"><span class="dot green" aria-hidden="true"></span>อีสเทิร์น มิเนอรัล</span>
+        <span class="seller-chip"><span class="dot green" aria-hidden="true"></span>เอเชีย พอลิเมอร์</span>
+        <span class="seller-chip"><span class="dot green" aria-hidden="true"></span>บางกอก คอมพาวนด์</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="dual-cta">
+        <div class="cta-panel buyer">
+          <span class="cta-tag">สำหรับผู้ซื้อ</span>
+          <h3>หาซัพพลายเออร์ที่ตรงสเปก ได้เร็วขึ้น</h3>
+          <ul class="cta-list">
+            <li>เปรียบเทียบราคาและเอกสารเทคนิคในหน้าเดียว</li>
+            <li>ส่ง RFQ ถึงผู้ขายที่ยืนยันตัวตนแล้วหลายรายพร้อมกัน</li>
+            <li>ติดตามสถานะดีลและประวัติคู่ค้าได้ตลอดเวลา</li>
+          </ul>
+          <a class="btn btn-outline" href="#">เริ่มค้นหาซัพพลายเออร์</a>
+        </div>
+        <div class="cta-panel seller">
+          <span class="cta-tag">สำหรับผู้ขาย</span>
+          <h3>ขยายฐานลูกค้าใหม่ โดยไม่เพิ่มทีมขาย</h3>
+          <ul class="cta-list">
+            <li>รับการแจ้งเตือน RFQ ที่ตรงกับสินค้าของคุณอัตโนมัติ</li>
+            <li>สร้างแคตตาล็อกจากเอกสาร SDS/TDS ที่มีอยู่แล้ว</li>
+            <li>ดูรายงานพฤติกรรมผู้ซื้อเพื่อวางแผนสินค้าใหม่</li>
+          </ul>
+          <a class="btn btn-outline" href="#">เริ่มขายสินค้าของคุณ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-col foot-brand">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="32" height="32" rx="7" fill="rgba(255,255,255,0.06)" stroke="var(--line-on-navy)"/>
+          <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+        </svg>
+        <p>ศูนย์กลาง B2B เคมีภัณฑ์ พลาสติก แร่ธาตุ และวัสดุรีไซเคิลของภูมิภาคอาเซียน เชื่อมผู้ซื้อและผู้ขายที่ผ่านการตรวจสอบตัวตนจริง</p>
+        <div class="newsletter">
+          <input type="email" placeholder="อีเมลของคุณ" aria-label="รับการแจ้งเตือนราคา">
+          <button class="btn btn-outline-light">รับข่าวสาร</button>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>แพลตฟอร์ม</h4>
+        <ul>
+          <li><a href="#categories">หมวดหมู่สินค้า</a></li>
+          <li><a href="#flow">ระบบ RFQ</a></li>
+          <li><a href="#ticker">ดัชนีราคา</a></li>
+          <li><a href="#">บริการเสริม</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>สำหรับผู้ใช้งาน</h4>
+        <ul>
+          <li><a href="#">สมัครเป็นผู้ซื้อ</a></li>
+          <li><a href="#">สมัครเป็นผู้ขาย</a></li>
+          <li><a href="#">แพ็กเกจและเครดิต</a></li>
+          <li><a href="#">Trust Score คืออะไร</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>ทรัพยากร</h4>
+        <ul>
+          <li><a href="#">ศูนย์ช่วยเหลือ</a></li>
+          <li><a href="#">บทความอุตสาหกรรม</a></li>
+          <li><a href="#">API สำหรับนักพัฒนา</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>บริษัท</h4>
+        <ul>
+          <li><a href="#">เกี่ยวกับเรา</a></li>
+          <li><a href="#">ติดต่อเรา</a></li>
+          <li><a href="#">นโยบายความเป็นส่วนตัว (PDPA)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="compliance-row">
+      <span class="compliance-badge">PDPA compliant</span>
+      <span class="compliance-badge">DIW registered partner</span>
+      <span class="compliance-badge">มอก. verified sellers only</span>
+      <span class="compliance-badge">ISO document standard</span>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
+      <span class="mono">v0.1 · Design concept for internal review</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
