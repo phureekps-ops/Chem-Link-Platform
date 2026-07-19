@@ -4,7 +4,12 @@
 // a BUYER role profile and a SELLER role profile (Section 14.1).
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Explicit targets (not just "native") so the correct query engine is
+  // bundled at `prisma generate` time regardless of whether the Alpine/musl
+  // runtime can auto-detect its OpenSSL version — see Dockerfile comment
+  // for the incident this fixes (Render Pre-Deploy failing on Node 20-alpine).
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
