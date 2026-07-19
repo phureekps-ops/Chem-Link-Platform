@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ส่งใบเสนอราคา — ChemLink Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10181A; --paper:#F1F3EF; --surface:#FFFFFF;
+    --navy:#0C2A2F; --orange:#DD5A26; --orange-ink:#8C3714; --orange-tint:#FBE6DB;
+    --green:#166F58; --green-tint:#E4F1EB; --green-ink:#0F4E3D;
+    --gold:#AD7A24; --gold-tint:#F7EEDC;
+    --red:#AE3A2E; --red-tint:#FBE9E7; --red-ink:#7A2A21;
+    --line:#DBDFD6; --line-on-navy:rgba(255,255,255,0.14);
+    --muted:#5B655F; --muted-on-navy:#A9C2C1;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --maxw:900px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Thai","IBM Plex Sans",sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;} img,svg{display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+
+  .util-bar{background:var(--navy);color:var(--muted-on-navy);font-size:13px;}
+  .util-bar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;max-width:1180px;}
+  .util-bar a{text-decoration:none;color:var(--muted-on-navy);}
+
+  .nav{background:var(--surface);border-bottom:0.5px solid var(--line);}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:1180px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand-word{font-weight:600;font-size:18px;letter-spacing:-0.01em;}
+  .brand-word span{color:var(--orange);}
+
+  .btn{font-family:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);border:1.5px solid transparent;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
+  .btn-primary:hover{background:var(--orange-ink);border-color:var(--orange-ink);}
+  .btn-primary:disabled{opacity:0.55;cursor:not-allowed;}
+  .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-block{width:100%;}
+  .btn-lg{padding:13px 20px;font-size:15px;}
+
+  .page-head{padding:36px 0 8px;}
+  .crumb{font-size:13px;color:var(--muted);margin-bottom:14px;}
+  .crumb a{text-decoration:none;color:var(--muted);}
+  .crumb a:hover{color:var(--navy);}
+  .page-title{font-size:24px;font-weight:700;margin:0 0 6px;letter-spacing:-0.01em;}
+  .page-sub{font-size:14px;color:var(--muted);}
+
+  section{padding:24px 0 64px;}
+
+  .auth-gate{background:var(--gold-tint);border-radius:var(--radius-lg);padding:24px 28px;text-align:center;margin-bottom:24px;}
+  .auth-gate p{font-size:14px;color:var(--gold);margin:0 0 14px;}
+
+  .deal-id-card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;}
+  .deal-id-row{display:flex;gap:12px;align-items:flex-end;}
+  .deal-id-row .field{flex:1;margin:0;}
+  .deal-id-row label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+  .deal-id-row input{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:13px;}
+  .deal-id-hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;}
+
+  .card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:30px;}
+  .card-title{font-size:16px;font-weight:600;margin:0 0 4px;}
+  .card-sub{font-size:13px;color:var(--muted);margin:0 0 22px;}
+
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .field{margin-bottom:18px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  input[type=text], input[type=number], input[type=date]{
+    width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);
+  }
+  input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(221,90,38,0.12);}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px;}
+
+  .msg{border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;margin-bottom:18px;display:none;}
+  .msg.error{background:var(--red-tint);color:var(--red-ink);}
+
+  .result-panel{display:none;text-align:center;padding:10px 4px;}
+  .result-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;background:var(--green-tint);color:var(--green-ink);}
+  .result-title{font-size:17px;font-weight:700;margin:0 0 8px;}
+  .result-sub{font-size:13.5px;color:var(--muted);line-height:1.7;margin:0 0 20px;}
+  .result-detail{background:var(--paper);border-radius:var(--radius-sm);padding:14px 16px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink);text-align:left;margin-bottom:20px;}
+  .result-detail div{display:flex;justify-content:space-between;padding:4px 0;}
+  .result-detail .k{color:var(--muted);}
+
+  footer{background:var(--navy);color:var(--muted-on-navy);padding:28px 0;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;flex-wrap:wrap;gap:12px;max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  @media (max-width:640px){
+    .wrap{padding:0 20px;}
+    .field-row{grid-template-columns:1fr;}
+    .deal-id-row{flex-direction:column;align-items:stretch;}
+  }
+</style>
+</head>
+<body>
+
+<div class="util-bar">
+  <div class="wrap">
+    <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
+    <a href="index.html">กลับหน้าแรก</a>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="7" fill="#0C2A2F"/>
+        <path d="M17 6L28 12V22L17 28L6 22V12L17 6Z" stroke="#DD5A26" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="3.4" fill="#DD5A26"/>
+      </svg>
+      <span class="brand-word">ChemLink <span>Platform</span></span>
+    </a>
+    <span id="nav-user" class="mono" style="font-size:13px;color:var(--muted);"></span>
+  </div>
+</nav>
+
+<main>
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumb"><a href="deal-room.html">Deal Room</a> / <span style="color:var(--ink);">ส่งใบเสนอราคา</span></div>
+      <h1 class="page-title">ส่งใบเสนอราคา (Quote)</h1>
+      <p class="page-sub">สำหรับผู้ขาย — ส่งใบเสนอราคาฉบับใหม่ หรือปรับปรุงราคาสำหรับ Deal ที่กำลังเจรจาอยู่ (Section 6 ขั้นที่ 4-5)</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+
+      <div class="auth-gate" id="auth-gate" style="display:none;">
+        <p>ต้องเข้าสู่ระบบก่อนจึงจะส่งใบเสนอราคาได้</p>
+        <a class="btn btn-primary" href="login.html?redirect=submit-quote.html">เข้าสู่ระบบ</a>
+      </div>
+
+      <div id="authed-content">
+        <div class="deal-id-card">
+          <div class="deal-id-row">
+            <div class="field">
+              <label for="deal-id-input">Deal ID</label>
+              <input type="text" id="deal-id-input" placeholder="เช่น 3f9a2c1e-...">
+            </div>
+            <button class="btn btn-outline" id="load-deal-btn" style="height:42px;">โหลด Deal</button>
+          </div>
+          <div class="deal-id-hint">
+            หา Deal ID ได้จาก <span class="mono">GET /api/v1/deals/incoming</span> (รายการ RFQ ที่ส่งเข้ามาหาบริษัทของคุณ) — ใส่ ID ของ Deal ที่ต้องการเสนอราคา แล้วกด "โหลด Deal" เพื่อยืนยันก่อนกรอกใบเสนอราคา
+          </div>
+        </div>
+
+        <div class="card" id="form-card" style="display:none;">
+          <h2 class="card-title" id="deal-context-title">ใบเสนอราคาใหม่</h2>
+          <p class="card-sub" id="deal-context-sub"></p>
+
+          <div class="msg error" id="error-msg"></div>
+
+          <form id="quote-form" novalidate>
+            <div class="field-row">
+              <div class="field">
+                <label for="price">ราคา</label>
+                <input type="number" id="price" step="0.01" min="0.01" required>
+              </div>
+              <div class="field">
+                <label for="priceUnit">หน่วยราคา</label>
+                <input type="text" id="priceUnit" placeholder="บาท/กก." required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="paymentTerms">เงื่อนไขการชำระเงิน</label>
+              <input type="text" id="paymentTerms" placeholder="เครดิต 30 วัน" required>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="leadTimeDays">ระยะเวลาส่งมอบ (วัน)</label>
+                <input type="number" id="leadTimeDays" min="0" required>
+              </div>
+              <div class="field">
+                <label for="moqValue">MOQ (ถ้ามี)</label>
+                <input type="number" id="moqValue" min="0">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="validUntil">ใบเสนอราคามีผลถึงวันที่</label>
+              <input type="date" id="validUntil">
+              <div class="hint">เว้นว่างได้หากไม่ต้องการกำหนดวันหมดอายุ</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-btn">ส่งใบเสนอราคา</button>
+          </form>
+        </div>
+
+        <div class="card result-panel" id="result-panel">
+          <div class="result-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <h3 class="result-title">ส่งใบเสนอราคาสำเร็จ</h3>
+          <p class="result-sub">ผู้ซื้อจะเห็นใบเสนอราคานี้ใน Deal Room ทันที และได้รับการแจ้งเตือน</p>
+          <div class="result-detail" id="result-detail"></div>
+          <button class="btn btn-outline btn-block" onclick="resetForm()">ส่งใบเสนอราคาอีกฉบับ / Deal อื่น</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-bottom">
+    <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
+    <span class="mono">API: <span id="api-base-label"></span></span>
+  </div>
+</footer>
+
+<script>
+  const API_BASE_URL = 'http://localhost:3000/api/v1';
+  document.getElementById('api-base-label').textContent = API_BASE_URL;
+
+  const token = localStorage.getItem('chemlink_access_token');
+  const userRaw = localStorage.getItem('chemlink_user');
+
+  if (!token) {
+    document.getElementById('auth-gate').style.display = 'block';
+    document.getElementById('authed-content').style.display = 'none';
+  } else {
+    try {
+      const user = JSON.parse(userRaw);
+      document.getElementById('nav-user').textContent = user.fullName + ' \u00b7 ' + user.allowedRoles.join('/');
+    } catch (e) {}
+  }
+
+  const params = new URLSearchParams(location.search);
+  const prefillDealId = params.get('dealId');
+  if (prefillDealId) {
+    document.getElementById('deal-id-input').value = prefillDealId;
+  }
+
+  async function loadDeal() {
+    const dealId = document.getElementById('deal-id-input').value.trim();
+    if (!dealId) return;
+
+    const btn = document.getElementById('load-deal-btn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังโหลด...';
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/deals/${dealId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'ไม่พบ Deal นี้'));
+      }
+
+      document.getElementById('deal-context-title').textContent = `ใบเสนอราคาสำหรับ RFQ: ${data.rfq.productName}`;
+      document.getElementById('deal-context-sub').textContent =
+        `${data.rfq.quantityValue} ${data.rfq.quantityUnit} \u00b7 ส่งมอบที่ ${data.rfq.deliveryLocation} \u00b7 สถานะ Deal ปัจจุบัน: ${data.status}`;
+      document.getElementById('form-card').style.display = 'block';
+      document.getElementById('form-card').dataset.dealId = dealId;
+      document.getElementById('result-panel').style.display = 'none';
+    } catch (err) {
+      const isNetworkError = err instanceof TypeError;
+      alert(isNetworkError
+        ? `เชื่อมต่อ API ที่ ${API_BASE_URL} ไม่ได้ — ตรวจสอบว่ารัน backend อยู่`
+        : err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'โหลด Deal';
+    }
+  }
+  document.getElementById('load-deal-btn').addEventListener('click', loadDeal);
+  if (prefillDealId) loadDeal();
+
+  function showError(text) {
+    const el = document.getElementById('error-msg');
+    el.textContent = text;
+    el.style.display = 'block';
+  }
+
+  document.getElementById('quote-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.getElementById('error-msg').style.display = 'none';
+
+    const dealId = document.getElementById('form-card').dataset.dealId;
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังส่ง...';
+
+    const payload = {
+      price: parseFloat(document.getElementById('price').value),
+      priceUnit: document.getElementById('priceUnit').value,
+      paymentTerms: document.getElementById('paymentTerms').value,
+      leadTimeDays: parseInt(document.getElementById('leadTimeDays').value, 10),
+      moqValue: document.getElementById('moqValue').value ? parseFloat(document.getElementById('moqValue').value) : undefined,
+      validUntil: document.getElementById('validUntil').value || undefined,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/deals/${dealId}/quotes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'ส่งใบเสนอราคาไม่สำเร็จ'));
+      }
+
+      document.getElementById('form-card').style.display = 'none';
+      document.getElementById('result-detail').innerHTML = `
+        <div><span class="k">ฉบับที่</span><span>${data.version}</span></div>
+        <div><span class="k">ราคา</span><span>${data.price} ${data.priceUnit}</span></div>
+        <div><span class="k">เงื่อนไขชำระเงิน</span><span>${data.paymentTerms}</span></div>
+        <div><span class="k">ระยะเวลาส่งมอบ</span><span>${data.leadTimeDays} วัน</span></div>
+      `;
+      document.getElementById('result-panel').style.display = 'block';
+    } catch (err) {
+      const isNetworkError = err instanceof TypeError;
+      showError(isNetworkError
+        ? `เชื่อมต่อ API ที่ ${API_BASE_URL} ไม่ได้ — ตรวจสอบว่ารัน backend อยู่`
+        : err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'ส่งใบเสนอราคา';
+    }
+  });
+
+  function resetForm() {
+    document.getElementById('quote-form').reset();
+    document.getElementById('form-card').style.display = 'none';
+    document.getElementById('result-panel').style.display = 'none';
+    document.getElementById('deal-id-input').value = '';
+  }
+</script>
+
+</body>
+</html>
