@@ -142,6 +142,20 @@
 
   .action-row{display:flex;flex-direction:column;gap:10px;}
 
+  /* dynamic connect banner */
+  .connect-card{background:var(--surface);border:0.5px solid var(--line);border-radius:var(--radius-lg);padding:18px 22px;margin:20px 0;}
+  .connect-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
+  .connect-row .field{flex:1;min-width:220px;}
+  .connect-row label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+  .connect-row input{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:13px;}
+  .connect-hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;}
+  .connect-badge{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+  .connect-badge.demo{background:var(--gold-tint);color:var(--gold);}
+  .connect-badge.live{background:var(--green-tint);color:var(--green-ink);}
+  .banner{border-radius:var(--radius-md);padding:14px 18px;font-size:13.5px;margin:16px 0;display:none;}
+  .banner.error{background:var(--red-tint);color:var(--red-ink);}
+  .banner.info{background:var(--gold-tint);color:var(--gold);}
+
   /* rating prompt preview */
   .rating-preview{background:var(--surface);border-top:0.5px solid var(--line);padding:56px 0 64px;}
   .section-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--orange-ink);letter-spacing:0.04em;margin-bottom:10px;}
@@ -184,7 +198,7 @@
     <span>ChemLink Platform — ศูนย์กลาง B2B เคมีภัณฑ์ครบวงจรของอาเซียน</span>
     <div class="util-links">
       <a href="#">TH</a><span class="divider"></span><a href="#">EN</a><span class="divider"></span>
-      <a href="#">ติดต่อฝ่ายขาย</a><span class="divider"></span><a href="#">เข้าสู่ระบบ</a>
+      <a href="#">ติดต่อฝ่ายขาย</a><span class="divider"></span><a href="login.html" id="login-link">เข้าสู่ระบบ</a>
     </div>
   </div>
 </div>
@@ -217,16 +231,34 @@
   <header class="deal-head">
     <div class="wrap">
       <div class="crumb">
-        <a href="chemlink_homepage.html">หน้าแรก</a><span>/</span>
+        <a href="index.html">หน้าแรก</a><span>/</span>
         <a href="rfq.html">RFQ ของฉัน</a><span>/</span>
         <span style="color:var(--ink);">Deal Room</span>
       </div>
+
+      <div class="connect-card">
+        <span class="connect-badge demo" id="connect-badge">ตัวอย่าง</span>
+        <div class="connect-row">
+          <div class="field">
+            <label for="deal-id-input">เชื่อมกับ Deal จริง (Deal ID)</label>
+            <input type="text" id="deal-id-input" placeholder="วาง Deal ID ที่นี่ เช่น 3f9a2c1e-...">
+          </div>
+          <button class="btn btn-outline" id="load-deal-btn" style="height:42px;">โหลด Deal</button>
+        </div>
+        <div class="connect-hint" id="connect-hint">
+          ตอนนี้กำลังแสดง <strong>ข้อมูลตัวอย่าง</strong> ด้านล่าง — วาง Deal ID จริง (หาได้จาก <span class="mono">GET /api/v1/deals/incoming</span> หลังล็อกอิน) แล้วกด "โหลด Deal" เพื่อดึงข้อมูลจริงจาก API และแทนที่เนื้อหาด้านล่างทั้งหมด
+        </div>
+      </div>
+
+      <div class="banner error" id="error-banner"></div>
+      <div class="banner info" id="auth-banner">ต้องเข้าสู่ระบบก่อนจึงจะโหลด Deal จริงได้ — <a href="#" id="auth-login-link" style="color:var(--gold);font-weight:600;">เข้าสู่ระบบ</a></div>
+
       <div class="deal-bar">
         <div>
-          <h1 class="deal-title">เม็ดพลาสติก PP รีไซเคิล เกรด Injection · 12,000 กก.</h1>
-          <div class="deal-sub">RFQ <span class="mono">#CL-RFQ-08842</span> · เจรจากับ บจก. ไทยโพลีไซเคิล · เริ่มเจรจา 14 ก.ค. 2569</div>
+          <h1 class="deal-title" id="deal-title">เม็ดพลาสติก PP รีไซเคิล เกรด Injection · 12,000 กก.</h1>
+          <div class="deal-sub" id="deal-sub">RFQ <span class="mono">#CL-RFQ-08842</span> · เจรจากับ บจก. ไทยโพลีไซเคิล · เริ่มเจรจา 14 ก.ค. 2569</div>
         </div>
-        <span class="status-pill"><span class="dot" aria-hidden="true"></span> กำลังเจรจาต่อรอง</span>
+        <span class="status-pill" id="status-pill"><span class="dot" aria-hidden="true"></span> <span id="status-text">กำลังเจรจาต่อรอง</span></span>
       </div>
     </div>
   </header>
@@ -236,7 +268,7 @@
 
       <div>
         <div class="thread-card">
-          <div class="thread">
+          <div class="thread" id="thread">
 
             <div class="sys-msg">สร้างคำขอ RFQ · ต้องการ 12,000 กก. ส่งบางปูภายใน 15 ส.ค. 2569 · เครดิต 30 วัน</div>
             <div class="day-divider">14 กรกฎาคม 2569</div>
@@ -315,11 +347,11 @@
           </div>
 
           <div class="composer">
-            <button class="composer-icon-btn" aria-label="แนบไฟล์">
+            <button class="composer-icon-btn" aria-label="แนบไฟล์" onclick="alert('การแนบไฟล์ยังไม่รองรับในเวอร์ชันนี้')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 12.5l-8.5 8.5a4.5 4.5 0 0 1-6.4-6.4l9-9a3 3 0 0 1 4.2 4.2l-9 9a1.5 1.5 0 0 1-2.1-2.1l8.5-8.5"/></svg>
             </button>
-            <textarea placeholder="พิมพ์ข้อความถึงคู่ค้า..."></textarea>
-            <button class="btn btn-primary" style="height:44px;">ส่ง</button>
+            <textarea placeholder="พิมพ์ข้อความถึงคู่ค้า..." id="composer-input"></textarea>
+            <button class="btn btn-primary" style="height:44px;" id="composer-send-btn">ส่ง</button>
           </div>
         </div>
       </div>
@@ -327,36 +359,36 @@
       <div>
         <div class="card">
           <h3 class="card-title">สรุปดีลล่าสุด</h3>
-          <div class="sum-row"><span class="k">ราคาล่าสุด</span><span class="v big">36.80 บ./กก.</span></div>
-          <div class="sum-row"><span class="k">มูลค่ารวมโดยประมาณ</span><span class="v">441,600 บาท</span></div>
-          <div class="sum-row"><span class="k">เงื่อนไขชำระเงิน</span><span class="v">เครดิต 30 วัน</span></div>
-          <div class="sum-row"><span class="k">ระยะเวลาส่งมอบ</span><span class="v">7 วัน</span></div>
-          <div class="sum-row"><span class="k">ใบเสนอราคาหมดอายุ</span><span class="v">22 ก.ค. 2569</span></div>
+          <div class="sum-row"><span class="k">ราคาล่าสุด</span><span class="v big" id="sum-price">36.80 บ./กก.</span></div>
+          <div class="sum-row"><span class="k">มูลค่ารวมโดยประมาณ</span><span class="v" id="sum-total">441,600 บาท</span></div>
+          <div class="sum-row"><span class="k">เงื่อนไขชำระเงิน</span><span class="v" id="sum-terms">เครดิต 30 วัน</span></div>
+          <div class="sum-row"><span class="k">ระยะเวลาส่งมอบ</span><span class="v" id="sum-lead">7 วัน</span></div>
+          <div class="sum-row"><span class="k">ใบเสนอราคาหมดอายุ</span><span class="v" id="sum-expiry">22 ก.ค. 2569</span></div>
         </div>
 
         <div class="card">
           <h3 class="card-title">คู่ค้า</h3>
           <div class="seller-mini">
-            <div class="seller-avatar">ทพ</div>
+            <div class="seller-avatar" id="seller-avatar">ทพ</div>
             <div>
-              <div class="seller-name"><span class="dot" aria-hidden="true"></span> บจก. ไทยโพลีไซเคิล</div>
-              <div class="seller-meta">สมุทรปราการ · ยืนยันตัวตนแล้ว</div>
+              <div class="seller-name"><span class="dot" aria-hidden="true"></span> <span id="seller-name">บจก. ไทยโพลีไซเคิล</span></div>
+              <div class="seller-meta" id="seller-meta">สมุทรปราการ · ยืนยันตัวตนแล้ว</div>
             </div>
           </div>
-          <span class="trust-pill">Trust Score 4.7/5</span>
+          <span class="trust-pill" id="trust-pill">Trust Score 4.7/5</span>
         </div>
 
         <div class="copilot-card">
-          <div class="copilot-title"><span class="copilot-dot" aria-hidden="true"></span> Negotiation Copilot</div>
+          <div class="copilot-title"><span class="copilot-dot" aria-hidden="true"></span> Negotiation Copilot <span class="connect-badge demo" style="margin:0 0 0 6px;">แนวคิด</span></div>
           <div class="copilot-range">35.90 <span>– 37.40 บาท/กก.</span></div>
           <div class="copilot-note">กรอบราคาที่อ้างอิงจากดีล PP รีไซเคิลเกรดเดียวกันที่ปิดสำเร็จในรอบ 90 วันที่ผ่านมา ราคาที่เสนออยู่ในกรอบที่เหมาะสม</div>
-          <div class="copilot-disclaimer">ข้อมูลนี้เป็นข้อมูลประกอบการตัดสินใจเท่านั้น ไม่ใช่คำแนะนำที่ผูกมัด</div>
+          <div class="copilot-disclaimer">ข้อมูลนี้เป็นข้อมูลประกอบการตัดสินใจเท่านั้น ไม่ใช่คำแนะนำที่ผูกมัด ยังไม่เชื่อมข้อมูลจริง</div>
         </div>
 
         <div class="card">
           <div class="action-row">
-            <a class="btn btn-outline btn-block" href="submit-quote.html">ส่งใบเสนอราคาใหม่ (เชื่อม API จริง)</a>
-            <button class="btn btn-primary btn-block">ปิดดีล</button>
+            <a class="btn btn-outline btn-block" href="submit-quote.html" id="submit-quote-link">ส่งใบเสนอราคาใหม่ (เชื่อม API จริง)</a>
+            <button class="btn btn-primary btn-block" id="close-deal-btn">ปิดดีล</button>
             <button class="btn btn-ghost btn-block">บันทึกไว้ก่อน</button>
             <button class="btn btn-danger-ghost btn-block">ยกเลิก RFQ นี้</button>
           </div>
@@ -368,7 +400,7 @@
 
   <section class="rating-preview">
     <div class="wrap">
-      <div class="section-eyebrow">หลังกดปิดดีล (ตัวอย่าง)</div>
+      <div class="section-eyebrow">หลังกดปิดดีล (ตัวอย่าง) <span class="connect-badge demo" style="margin-left:8px;">แนวคิด ยังไม่เชื่อมจริง</span></div>
       <h2 class="section-title">ป๊อปอัปขอให้คะแนนความน่าเชื่อถือ</h2>
       <p class="section-sub">ทันทีที่ปิดดีลสำเร็จ ระบบจะแสดงป๊อปอัปนี้ให้ผู้ซื้อให้คะแนนผู้ขายจากประสบการณ์จริง ซึ่งจะถูกนำไปคำนวณรวมกับ Trust Score ของคู่ค้า</p>
       <div class="modal-frame">
@@ -401,7 +433,7 @@
     <div class="foot-bottom">
       <span>© 2026 ChemLink Platform. สงวนลิขสิทธิ์.</span>
       <div class="foot-links">
-        <a href="chemlink_homepage.html">หน้าแรก</a>
+        <a href="index.html">หน้าแรก</a>
         <a href="product.html">หน้าสินค้า</a>
         <a href="rfq.html">RFQ</a>
         <a href="#">PDPA</a>
@@ -409,6 +441,234 @@
     </div>
   </div>
 </footer>
+
+<script>
+  const API_BASE_URL = 'http://localhost:3000/api/v1';
+  const token = localStorage.getItem('chemlink_access_token');
+  let currentUser = null;
+  try { currentUser = JSON.parse(localStorage.getItem('chemlink_user') || 'null'); } catch (e) {}
+
+  document.getElementById('auth-login-link').href = 'login.html?redirect=' + encodeURIComponent(location.href);
+  document.getElementById('login-link').href = token ? '#' : 'login.html';
+  if (token && currentUser) document.getElementById('login-link').textContent = currentUser.fullName;
+
+  function showBanner(id, text) {
+    const el = document.getElementById(id);
+    if (text) el.textContent = text;
+    el.style.display = 'block';
+  }
+  function hideBanner(id) { document.getElementById(id).style.display = 'none'; }
+
+  const STATUS_LABEL = {
+    INVITED: 'รอผู้ขายรับทราบ', ACKNOWLEDGED: 'ผู้ขายรับทราบแล้ว', QUOTED: 'มีใบเสนอราคาแล้ว',
+    NEGOTIATING: 'กำลังเจรจาต่อรอง', WON: 'ปิดดีลสำเร็จ', LOST: 'ไม่ได้รับเลือก', DECLINED: 'ผู้ขายปฏิเสธ RFQ นี้',
+  };
+
+  function fmtTime(iso) {
+    return new Date(iso).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDate(iso) {
+    return iso ? new Date(iso).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : 'ไม่ระบุ';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderQuoteCard(quote, sellerLegalName) {
+    return `
+      <div class="quote-card">
+        <div class="quote-card-head">
+          <span class="quote-card-title">ใบเสนอราคา ฉบับที่ ${quote.version}</span>
+          <span class="quote-card-num">โดย ${escapeHtml(sellerLegalName)}</span>
+        </div>
+        <div class="quote-card-body">
+          <div class="qc-item"><div class="k">ราคา</div><div class="v">${quote.price} ${escapeHtml(quote.priceUnit)}</div></div>
+          <div class="qc-item"><div class="k">เงื่อนไขชำระเงิน</div><div class="v">${escapeHtml(quote.paymentTerms)}</div></div>
+          <div class="qc-item"><div class="k">ระยะเวลาส่งมอบ</div><div class="v">${quote.leadTimeDays} วัน</div></div>
+          <div class="qc-item"><div class="k">MOQ</div><div class="v">${quote.moqValue ?? '-'}</div></div>
+        </div>
+      </div>`;
+  }
+
+  function renderMessage(msg, buyerCompanyId, sellerLegalName) {
+    if (msg.type === 'SYSTEM') {
+      return `<div class="sys-msg">${escapeHtml(msg.content || 'อัปเดตสถานะ')}</div>`;
+    }
+    if (msg.type === 'QUOTE' && msg.relatedQuote) {
+      return renderQuoteCard(msg.relatedQuote, sellerLegalName);
+    }
+    const isBuyer = msg.senderUser && msg.senderUser.companyId === buyerCompanyId;
+    const name = msg.senderUser ? msg.senderUser.fullName : 'ไม่ทราบผู้ส่ง';
+    const roleLabel = isBuyer ? '(ผู้ซื้อ)' : '(ผู้ขาย)';
+    const initials = name.slice(0, 2);
+    if (msg.type === 'DOCUMENT') {
+      return `
+        <div class="msg-row ${isBuyer ? 'buyer' : ''}">
+          <div class="msg-avatar">${escapeHtml(initials)}</div>
+          <div class="msg-body">
+            <div class="msg-meta">${escapeHtml(name)} ${roleLabel} · ${fmtTime(msg.createdAt)}</div>
+            <div class="msg-bubble" style="display:flex;align-items:center;gap:10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 3h9l5 5v13H6V3Z"/><path d="M15 3v5h5"/></svg>
+              <a href="${escapeHtml(msg.attachmentUrl)}" target="_blank" rel="noopener">${escapeHtml(msg.attachmentUrl)}</a>
+            </div>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="msg-row ${isBuyer ? 'buyer' : ''}">
+        <div class="msg-avatar">${escapeHtml(initials)}</div>
+        <div class="msg-body">
+          <div class="msg-meta">${escapeHtml(name)} ${roleLabel} · ${fmtTime(msg.createdAt)}</div>
+          <div class="msg-bubble">${escapeHtml(msg.content)}</div>
+        </div>
+      </div>`;
+  }
+
+  let activeDealId = null;
+
+  async function loadDeal(dealId, { pushUrl = true } = {}) {
+    hideBanner('error-banner');
+    hideBanner('auth-banner');
+
+    if (!token) {
+      showBanner('auth-banner');
+      return;
+    }
+
+    const btn = document.getElementById('load-deal-btn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังโหลด...';
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/deals/${dealId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'ไม่พบ Deal นี้'));
+      }
+
+      activeDealId = dealId;
+      if (pushUrl) history.replaceState(null, '', `deal-room.html?id=${encodeURIComponent(dealId)}`);
+      document.getElementById('connect-badge').textContent = 'เชื่อมต่อแล้ว — ข้อมูลจริง';
+      document.getElementById('connect-badge').className = 'connect-badge live';
+      document.getElementById('connect-hint').innerHTML = `กำลังแสดงข้อมูลจริงของ Deal <span class="mono">${dealId}</span>`;
+
+      renderDeal(data);
+    } catch (err) {
+      const isNetworkError = err instanceof TypeError;
+      showBanner('error-banner', isNetworkError
+        ? `เชื่อมต่อ API ที่ ${API_BASE_URL} ไม่ได้ — ตรวจสอบว่ารัน backend อยู่ (docker compose up)`
+        : err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'โหลด Deal';
+    }
+  }
+
+  function renderDeal(data) {
+    const rfq = data.rfq;
+    const isBuyerViewer = currentUser && currentUser.companyId === rfq.buyerCompanyId;
+
+    document.getElementById('deal-title').textContent = `${rfq.productName} · ${rfq.quantityValue} ${rfq.quantityUnit}`;
+    document.getElementById('deal-sub').innerHTML =
+      `RFQ <span class="mono">#${rfq.id.slice(0, 8)}</span> · เจรจากับ ${escapeHtml(data.sellerCompany.legalName)} · ส่งมอบที่ ${escapeHtml(rfq.deliveryLocation)}`;
+    document.getElementById('status-text').textContent = STATUS_LABEL[data.status] || data.status;
+
+    document.getElementById('seller-name').textContent = data.sellerCompany.legalName;
+    document.getElementById('seller-meta').textContent = (data.sellerCompany.province || 'ไม่ระบุจังหวัด');
+    document.getElementById('seller-avatar').textContent = data.sellerCompany.legalName.slice(0, 2);
+    document.getElementById('trust-pill').style.display = 'none'; // not included in this endpoint's response
+
+    const quotes = data.quotes || [];
+    if (quotes.length > 0) {
+      const latest = quotes[0];
+      document.getElementById('sum-price').textContent = `${latest.price} ${latest.priceUnit}`;
+      document.getElementById('sum-total').textContent =
+        (latest.price * rfq.quantityValue).toLocaleString('th-TH') + ' บาท (โดยประมาณ)';
+      document.getElementById('sum-terms').textContent = latest.paymentTerms;
+      document.getElementById('sum-lead').textContent = `${latest.leadTimeDays} วัน`;
+      document.getElementById('sum-expiry').textContent = fmtDate(latest.validUntil);
+    } else {
+      ['sum-price', 'sum-total', 'sum-terms', 'sum-lead', 'sum-expiry'].forEach(id => {
+        document.getElementById(id).textContent = 'ยังไม่มีใบเสนอราคา';
+      });
+    }
+
+    const threadEl = document.getElementById('thread');
+    threadEl.innerHTML = (data.messages || [])
+      .map(m => renderMessage(m, rfq.buyerCompanyId, data.sellerCompany.legalName))
+      .join('');
+    threadEl.scrollTop = threadEl.scrollHeight;
+
+    document.getElementById('submit-quote-link').href = `submit-quote.html?dealId=${data.id}`;
+
+    const closeBtn = document.getElementById('close-deal-btn');
+    if (!isBuyerViewer) {
+      closeBtn.disabled = true;
+      closeBtn.textContent = 'ปิดดีล (เฉพาะผู้ซื้อ)';
+    } else {
+      closeBtn.disabled = false;
+      closeBtn.textContent = 'ปิดดีล';
+    }
+  }
+
+  document.getElementById('load-deal-btn').addEventListener('click', () => {
+    const id = document.getElementById('deal-id-input').value.trim();
+    if (id) loadDeal(id);
+  });
+
+  document.getElementById('composer-send-btn').addEventListener('click', async () => {
+    if (!activeDealId) { alert('โหลด Deal จริงก่อนถึงจะส่งข้อความได้'); return; }
+    const input = document.getElementById('composer-input');
+    const content = input.value.trim();
+    if (!content) return;
+
+    const btn = document.getElementById('composer-send-btn');
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API_BASE_URL}/deals/${activeDealId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ content }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(Array.isArray(data.message) ? data.message.join(', ') : data.message);
+      input.value = '';
+      await loadDeal(activeDealId, { pushUrl: false });
+    } catch (err) {
+      alert('ส่งข้อความไม่สำเร็จ: ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('close-deal-btn').addEventListener('click', async () => {
+    if (!activeDealId) { alert('โหลด Deal จริงก่อนถึงจะปิดดีลได้'); return; }
+    if (!confirm('ยืนยันปิดดีลนี้เป็นผู้ชนะ? Deal อื่นภายใต้ RFQ เดียวกันจะถูกปรับเป็น "ไม่ได้รับเลือก" โดยอัตโนมัติ')) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/deals/${activeDealId}/close`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(Array.isArray(data.message) ? data.message.join(', ') : data.message);
+      await loadDeal(activeDealId, { pushUrl: false });
+    } catch (err) {
+      alert('ปิดดีลไม่สำเร็จ: ' + err.message);
+    }
+  });
+
+  // Auto-load from ?id= in the URL
+  const initialId = new URLSearchParams(location.search).get('id');
+  if (initialId) {
+    document.getElementById('deal-id-input').value = initialId;
+    loadDeal(initialId, { pushUrl: false });
+  } else if (!token) {
+    showBanner('auth-banner');
+  }
+</script>
 
 </body>
 </html>
