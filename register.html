@@ -314,7 +314,7 @@
   // Points at a locally-running backend (see chemlink-backend/README.md --
   // `docker compose up --build`). Change this if you deploy the API
   // somewhere other than localhost:3000.
-  const API_BASE_URL = 'http://localhost:3000/api/v1';
+  const API_BASE_URL = 'https://chemlink-backend.onrender.com/api/v1';
   document.getElementById('api-base-label').textContent = API_BASE_URL;
 
   const selectedRoles = new Set();
