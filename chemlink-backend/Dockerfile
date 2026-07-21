@@ -25,6 +25,10 @@ RUN npm ci
 COPY . .
 RUN npx prisma generate
 RUN npm run build
+# Fail the BUILD (with a clear message) if the compiler didn't produce the
+# expected entry point, instead of only discovering it later as a cryptic
+# "Cannot find module '/app/dist/main'" at container start.
+RUN ls -la dist && test -f dist/main.js || (echo "BUILD ERROR: dist/main.js was not produced by 'npm run build'" && exit 1)
 
 # --- production ------------------------------------------------------------
 FROM node:20-alpine AS production
