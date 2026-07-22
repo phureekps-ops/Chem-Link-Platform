@@ -11,6 +11,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { RfqModule } from './modules/rfq/rfq.module';
 import { DealsModule } from './modules/deals/deals.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CreditsModule } from './modules/credits/credits.module';
 import { HealthController } from './modules/health/health.controller';
 
 @Module({
@@ -36,6 +37,7 @@ import { HealthController } from './modules/health/health.controller';
     RfqModule,
     DealsModule,
     NotificationsModule,
+    CreditsModule,
   ],
   controllers: [HealthController],
 })

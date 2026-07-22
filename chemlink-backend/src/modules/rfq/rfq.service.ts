@@ -4,12 +4,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DealMessageType, NotificationType, Prisma, RfqDistributionType, RfqStatus } from '@prisma/client';
+import {
+  CreditActionType,
+  DealMessageType,
+  NotificationType,
+  Prisma,
+  RfqDistributionType,
+  RfqStatus,
+  RoleType,
+} from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { SubmitRfqDto } from './dto/submit-rfq.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CreditsService } from '../credits/credits.service';
 
 const DEAL_ROOM_INCLUDE = {
   quotes: { orderBy: { version: 'desc' as const } },
@@ -22,6 +31,7 @@ export class RfqService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
+    private readonly credits: CreditsService,
   ) {}
 
   // --- Draft lifecycle (Section 5.4 step 1) ---
@@ -107,6 +117,15 @@ export class RfqService {
     }
 
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Section 13.1 — sending an RFQ is a tier-2 metered action (free
+      // monthly quota, then wallet). Charged once per submission, not per
+      // invited seller, and inside this same transaction: an RFQ that
+      // can't be paid for must not end up SUBMITTED with Deals attached.
+      await this.credits.chargeForAction(tx, buyerCompanyId, CreditActionType.SEND_RFQ, RoleType.BUYER, {
+        type: 'Rfq',
+        id: rfq.id,
+      });
+
       const updated = await tx.rfq.update({
         where: { id: rfq.id },
         data: {

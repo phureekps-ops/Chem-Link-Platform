@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
-import { RfqDistributionType, RfqStatus } from '@prisma/client';
+import { CreditActionType, RfqDistributionType, RfqStatus, RoleType } from '@prisma/client';
 import { RfqService } from './rfq.service';
 
 describe('RfqService', () => {
@@ -18,7 +18,14 @@ describe('RfqService', () => {
     dispatchEmails: jest.fn().mockResolvedValue(undefined),
   };
 
-  const service = new RfqService(prismaMock as any, notificationsMock as any);
+  // Step 6 — submit() charges SEND_RFQ inside the same transaction (see
+  // rfq.service.ts). Defaults to succeeding; the "insufficient credits"
+  // test below overrides it to reject like CreditsService really would.
+  const creditsMock: any = {
+    chargeForAction: jest.fn().mockResolvedValue({ id: 'credit-txn-1' }),
+  };
+
+  const service = new RfqService(prismaMock as any, notificationsMock as any, creditsMock as any);
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -51,6 +58,7 @@ describe('RfqService', () => {
       // buyer tries to include itself alongside a real seller
       prismaMock.companyRole.findMany.mockResolvedValueOnce([{ companyId: 'company-b' }]);
       prismaMock.rfq.update.mockResolvedValueOnce({ ...draftRfq, status: RfqStatus.SUBMITTED });
+      prismaMock.deal.create.mockResolvedValueOnce({ id: 'deal-1' });
 
       await service.submit('company-a', 'rfq-1', {
         distributionType: RfqDistributionType.TARGETED,
@@ -85,6 +93,7 @@ describe('RfqService', () => {
       prismaMock.rfq.findUnique.mockResolvedValueOnce(draftRfq);
       prismaMock.product.findMany.mockResolvedValueOnce([{ sellerCompanyId: 'company-c' }]);
       prismaMock.rfq.update.mockResolvedValueOnce({ ...draftRfq, status: RfqStatus.SUBMITTED });
+      prismaMock.deal.create.mockResolvedValueOnce({ id: 'deal-1' });
 
       await service.submit('company-a', 'rfq-1', {
         distributionType: RfqDistributionType.MARKET,
@@ -102,6 +111,56 @@ describe('RfqService', () => {
       await expect(
         service.submit('company-a', 'rfq-1', { distributionType: RfqDistributionType.MARKET }),
       ).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('submit — Section 13 credit charge', () => {
+    const draftRfq = {
+      id: 'rfq-1',
+      buyerCompanyId: 'company-a',
+      status: RfqStatus.DRAFT,
+      categoryId: 'cat-1',
+      casNumber: null,
+    };
+
+    it('charges SEND_RFQ once, as the buyer, inside the same transaction as the Deal writes', async () => {
+      prismaMock.rfq.findUnique.mockResolvedValueOnce(draftRfq);
+      prismaMock.companyRole.findMany.mockResolvedValueOnce([{ companyId: 'company-b' }]);
+      prismaMock.rfq.update.mockResolvedValueOnce({ ...draftRfq, status: RfqStatus.SUBMITTED });
+      prismaMock.deal.create.mockResolvedValueOnce({ id: 'deal-1' });
+
+      await service.submit('company-a', 'rfq-1', {
+        distributionType: RfqDistributionType.TARGETED,
+        sellerCompanyIds: ['company-b'],
+      });
+
+      expect(creditsMock.chargeForAction).toHaveBeenCalledTimes(1);
+      expect(creditsMock.chargeForAction).toHaveBeenCalledWith(
+        prismaMock, // the mocked $transaction hands the tx client straight through
+        'company-a',
+        CreditActionType.SEND_RFQ,
+        RoleType.BUYER,
+        { type: 'Rfq', id: 'rfq-1' },
+      );
+    });
+
+    it('never creates a Deal when the buyer cannot afford to send the RFQ', async () => {
+      prismaMock.rfq.findUnique.mockResolvedValueOnce(draftRfq);
+      prismaMock.companyRole.findMany.mockResolvedValueOnce([{ companyId: 'company-b' }]);
+      const insufficientCredits = new Error('insufficient credits');
+      creditsMock.chargeForAction.mockRejectedValueOnce(insufficientCredits);
+
+      await expect(
+        service.submit('company-a', 'rfq-1', {
+          distributionType: RfqDistributionType.TARGETED,
+          sellerCompanyIds: ['company-b'],
+        }),
+      ).rejects.toThrow(insufficientCredits);
+
+      // The charge happens before the RFQ status flips or any Deal is
+      // created, so a failed charge must leave both untouched.
+      expect(prismaMock.rfq.update).not.toHaveBeenCalled();
+      expect(prismaMock.deal.create).not.toHaveBeenCalled();
     });
   });
 });

@@ -52,6 +52,7 @@ model Company {
   products Product[]
   buyerRfqs  Rfq[]  @relation("BuyerRfqs")
   sellerDeals Deal[] @relation("SellerDeals")
+  creditWallet CreditWallet? // Section 14.5 — one wallet per company, not per role
 
   @@map("companies")
 }
@@ -442,6 +443,148 @@ model Notification {
 
   @@index([userId, isRead])
   @@map("notifications")
+}
+
+// ============================================================
+// Build Sequence Step 6 — Credit & Billing System
+// (System Design Document, Section 13, 14.5, 16.2 step 6)
+//
+// Scope for this step (see chemlink-backend/README.md for the full note):
+// the Billing & Metering Layer core (Wallet, Ledger, Rate Card, atomic
+// debit) plus the free-quota-vs-wallet split from Section 13.4. Payment
+// Gateway Integration, Tax Invoice Generator, Auto Top-up and Fraud
+// Detection (Section 13.2's remaining Billing & Metering Layer rows) are
+// deferred — they depend on picking a real payment provider and, in the
+// Admin Credit Console's case, on the Admin panel/auth that doesn't exist
+// yet (Section 8 roadmap). Redis-backed balance caching (Section 13.5
+// performance risk) is Step 7+ per the .env.example note next to
+// REDIS_URL — this step's atomicity comes from a conditional UPDATE
+// (`WHERE balance >= cost`), not a cache.
+// ============================================================
+
+enum SubscriptionTier {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+// Section 13.4 — "Subscription + Credit แบบผสม": each tier bundles a
+// monthly free-credit quota; usage beyond quota debits the CreditWallet.
+model SubscriptionPlan {
+  id                 String           @id @default(uuid())
+  tier               SubscriptionTier @unique
+  nameTh             String
+  monthlyFreeCredits Int
+  priceMonthly       Decimal          @db.Decimal(12, 2)
+  priceYearly        Decimal          @db.Decimal(12, 2)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  wallets CreditWallet[]
+
+  @@map("subscription_plans")
+}
+
+// One wallet per Company (Section 14.5: "Credit Wallet ยังคงเป็นกระเป๋าเดียว
+// ต่อบริษัท" — explicitly NOT per role, even for dual-role companies).
+// monthlyFreeQuota is a snapshot of the plan's quota, copied in whenever
+// the plan changes or the monthly cycle resets, so the atomic quota-usage
+// check below never needs to join SubscriptionPlan.
+model CreditWallet {
+  id                   String            @id @default(uuid())
+  companyId            String            @unique
+  company              Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  planId               String?
+  plan                 SubscriptionPlan? @relation(fields: [planId], references: [id])
+  balance              Int               @default(0)
+  monthlyFreeQuota     Int               @default(0)
+  monthlyFreeQuotaUsed Int               @default(0)
+  quotaResetAt         DateTime          @default(now())
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  transactions CreditTransaction[]
+
+  @@map("credit_wallets")
+}
+
+// Section 13.1's three-tier policy table. QUOTA_ELIGIBLE (tier 2 — free
+// monthly quota, then wallet) vs ALWAYS_CHARGED (tier 3 — no quota, ever)
+// is a business rule, not a schema fact — see CreditsService.QUOTA_ELIGIBLE_ACTIONS.
+// Only SEND_RFQ is wired into an actual endpoint so far (RfqService.submit);
+// the rest exist here so rates can be set ahead of those features shipping
+// (download full SDS/COA/TDS, Sourcing Assistant, Deal Room, price-index
+// export, contact unlock, market intelligence, lead unlock — see README).
+enum CreditActionType {
+  SEND_RFQ
+  DOWNLOAD_TECH_DOCUMENT
+  AI_SOURCING_QUERY
+  DEAL_ROOM_ACCESS
+  EXPORT_PRICE_INDEX
+  UNLOCK_CONTACT
+  MARKET_INTELLIGENCE_REPORT
+  UNLOCK_LEAD
+}
+
+enum CreditTxnType {
+  DEBIT  // wallet balance charge (quota-covered usage does NOT create a DEBIT — see fromQuota)
+  CREDIT // top-up / admin grant
+  REFUND // credit returned, e.g. reversing a charge for an action that failed downstream
+}
+
+// Immutable ledger (Section 13.2 "Credit Ledger (Immutable)"). Application
+// code only ever INSERTs here — see the comment on CreditsService for the
+// enforcement note. One row per metered event, whether it drew from the
+// free quota or the wallet balance, so usage can be reported either way
+// (Section 13.2 Usage Analytics Dashboard / 14.5 role breakdown).
+model CreditTransaction {
+  id                String            @id @default(uuid())
+  walletId          String
+  wallet            CreditWallet      @relation(fields: [walletId], references: [id])
+  type              CreditTxnType
+  amount            Int               // always positive; `type` carries the sign
+  actionType        CreditActionType?
+  fromQuota         Boolean           @default(false) // true = paid from the free monthly quota, not wallet balance
+  roleContext       RoleType?         // Section 14.5 — usage broken out by BUYER/SELLER activity
+  relatedEntityType String?           // e.g. "Rfq"
+  relatedEntityId   String?
+  balanceAfter      Int               // wallet.balance snapshot after this txn (unchanged if fromQuota)
+  note              String?
+  createdAt         DateTime          @default(now())
+
+  @@index([walletId, createdAt])
+  @@map("credit_transactions")
+}
+
+// Section 13.2 "Credit Rate Card" — admin-editable without code changes.
+// Versioned by effectiveFrom so a past CreditTransaction always reflects
+// the rate actually charged at the time, even after prices change later.
+model CreditRateCard {
+  id            String           @id @default(uuid())
+  actionType    CreditActionType
+  creditsCost   Int
+  effectiveFrom DateTime         @default(now())
+  createdAt     DateTime         @default(now())
+
+  @@index([actionType, effectiveFrom])
+  @@map("credit_rate_cards")
+}
+
+// Section 13.2 "Top-up & Package Store" catalog. Purchasing a package
+// (payment collection) is deferred pending a payment provider decision —
+// see README; this table exists so the catalog can be defined and
+// displayed ahead of that integration.
+model CreditPackage {
+  id           String   @id @default(uuid())
+  name         String
+  creditAmount Int
+  priceThb     Decimal  @db.Decimal(12, 2)
+  bonusCredits Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("credit_packages")
 }
 
 

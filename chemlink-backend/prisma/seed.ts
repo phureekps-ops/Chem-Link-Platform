@@ -1,8 +1,50 @@
-import { PrismaClient, RoleType, ProductSpecGroup, ProductDocType } from '@prisma/client';
+import {
+  CreditActionType,
+  CreditTxnType,
+  PrismaClient,
+  RoleType,
+  ProductSpecGroup,
+  ProductDocType,
+  SubscriptionTier,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { computeCompositeTrustScore } from '../src/common/util/trust-score';
 
 const prisma = new PrismaClient();
+
+// Step 6 (Section 13) — starter rate card. These figures are illustrative
+// placeholders, not a finalized price list: Section 13.5 explicitly calls
+// for a willingness-to-pay test with pilot users before setting real
+// rates. 5 credits for a document download matches the example figure
+// used in Section 13.1's own price-transparency confirm-dialog copy.
+const SUBSCRIPTION_PLANS: Array<{
+  tier: SubscriptionTier;
+  nameTh: string;
+  monthlyFreeCredits: number;
+  priceMonthly: number;
+  priceYearly: number;
+}> = [
+  { tier: SubscriptionTier.BASIC, nameTh: 'Basic', monthlyFreeCredits: 50, priceMonthly: 0, priceYearly: 0 },
+  { tier: SubscriptionTier.PRO, nameTh: 'Pro', monthlyFreeCredits: 300, priceMonthly: 990, priceYearly: 9900 },
+  {
+    tier: SubscriptionTier.ENTERPRISE,
+    nameTh: 'Enterprise',
+    monthlyFreeCredits: 1500,
+    priceMonthly: 4990,
+    priceYearly: 49900,
+  },
+];
+
+const CREDIT_RATE_CARD: Array<{ actionType: CreditActionType; creditsCost: number }> = [
+  { actionType: CreditActionType.SEND_RFQ, creditsCost: 3 },
+  { actionType: CreditActionType.DOWNLOAD_TECH_DOCUMENT, creditsCost: 5 },
+  { actionType: CreditActionType.AI_SOURCING_QUERY, creditsCost: 2 },
+  { actionType: CreditActionType.DEAL_ROOM_ACCESS, creditsCost: 1 },
+  { actionType: CreditActionType.EXPORT_PRICE_INDEX, creditsCost: 10 },
+  { actionType: CreditActionType.UNLOCK_CONTACT, creditsCost: 15 },
+  { actionType: CreditActionType.MARKET_INTELLIGENCE_REPORT, creditsCost: 20 },
+  { actionType: CreditActionType.UNLOCK_LEAD, creditsCost: 8 },
+];
 
 // The 10 industry categories from the business plan (Section 5.1).
 const CATEGORIES = [
@@ -171,10 +213,75 @@ async function main() {
     });
   }
 
+  // --- Step 6: Credit & Billing (Section 13) ---
+
+  for (const plan of SUBSCRIPTION_PLANS) {
+    await prisma.subscriptionPlan.upsert({
+      where: { tier: plan.tier },
+      update: {
+        nameTh: plan.nameTh,
+        monthlyFreeCredits: plan.monthlyFreeCredits,
+        priceMonthly: plan.priceMonthly,
+        priceYearly: plan.priceYearly,
+      },
+      create: plan,
+    });
+  }
+  const basicPlan = await prisma.subscriptionPlan.findUniqueOrThrow({
+    where: { tier: SubscriptionTier.BASIC },
+  });
+
+  for (const rate of CREDIT_RATE_CARD) {
+    const active = await prisma.creditRateCard.findFirst({
+      where: { actionType: rate.actionType, effectiveFrom: { lte: new Date() } },
+      orderBy: { effectiveFrom: 'desc' },
+    });
+    if (!active) {
+      await prisma.creditRateCard.create({ data: rate });
+    }
+  }
+
+  // Sign-up bonus so both seed companies can exercise metered actions
+  // (e.g. POST /rfqs/:id/submit) immediately in a fresh dev environment,
+  // matching Section 13.5's "แจกเครดิตฟรีปริมาณมากให้... ผู้ใช้งานนำร่อง"
+  // mitigation for the credits-as-paywall chicken-and-egg risk.
+  for (const company of [dualRoleCo, buyerOnlyCo]) {
+    const wallet = await prisma.creditWallet.upsert({
+      where: { companyId: company.id },
+      update: {},
+      create: {
+        companyId: company.id,
+        planId: basicPlan.id,
+        monthlyFreeQuota: basicPlan.monthlyFreeCredits,
+        quotaResetAt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
+      },
+    });
+    const alreadyGranted = await prisma.creditTransaction.findFirst({
+      where: { walletId: wallet.id, type: CreditTxnType.CREDIT, note: 'seed: pilot sign-up bonus' },
+    });
+    if (!alreadyGranted) {
+      const topped = await prisma.creditWallet.update({
+        where: { id: wallet.id },
+        data: { balance: { increment: 100 } },
+      });
+      await prisma.creditTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: CreditTxnType.CREDIT,
+          amount: 100,
+          balanceAfter: topped.balance,
+          note: 'seed: pilot sign-up bonus',
+        },
+      });
+    }
+  }
+
   // eslint-disable-next-line no-console
   console.log('Seeded categories:', CATEGORIES.length);
   // eslint-disable-next-line no-console
   console.log('Seeded companies:', dualRoleCo.legalName, buyerOnlyCo.legalName);
+  // eslint-disable-next-line no-console
+  console.log('Seeded subscription plans + credit rate card (Step 6)');
   // eslint-disable-next-line no-console
   console.log('All seeded users share the password: Passw0rd!');
 }
